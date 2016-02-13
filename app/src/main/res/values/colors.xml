@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    //content background
+    <color name="weather_fine">#ACD1EE</color>
+    <color name="weather_fine_night">#2F4B8B</color>
+    <color name="weather_cloudy">#86BBE5</color>
+    <color name="weather_cloudy_night">#31418E</color>
+    <color name="weather_overcast">#2D89BA</color>
+    <color name="weather_overcast_night">#294D81</color>
+    <color name="weather_fog">#86BBE5</color>
+    <color name="weather_fog_night">#244D7B</color>
+    <color name="weather_rain">#2F8ABB</color>
+    <color name="weather_rain_night">#254E7B</color>
+    <color name="weather_shower">#2F8ABB</color>
+    <color name="weather_shower_night">#254E7B</color>
+    <color name="weather_snow">#2F8ABB</color>
+    <color name="weather_snow_night">#254E7B</color>
+    <color name="weather_snow_shower">#2F8ABB</color>
+    <color name="weather_snow_shower_night">#254E7B</color>
+    <color name="weather_thundershower">#93A6B2</color>
+    <color name="weather_thundershower_night">#1C2D40</color>
+    <color name="weather_sandstorm">#F7C140</color>
+    <color name="weather_sandstorm_night">#776A46</color>
+    <color name="weather_haze">#7D7F7E</color>
+    <color name="weather_haze_night">#535353</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="green">#00FF00</color>
+    <color name="yellow">#FFFF00</color>
+    <color name="orange">#FF8000</color>
+    <color name="red">#FF0000</color>
+    <color name="purple">#800080</color>
+    <color name="maroon">#800000</color>
+</resources>
