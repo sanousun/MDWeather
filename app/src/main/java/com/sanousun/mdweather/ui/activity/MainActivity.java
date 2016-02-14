@@ -287,6 +287,7 @@ public class MainActivity extends BaseActivity
         int colorRes = WeatherIconUtil.getBackColorResId(this, weatherType, isNight);
         if (colorRes != -1) {
             mContentContainer.setBackgroundColor(ContextCompat.getColor(this, colorRes));
+            mCollapsingTBLayout.setContentScrimColor(ContextCompat.getColor(this, colorRes));
         }
     }
 
