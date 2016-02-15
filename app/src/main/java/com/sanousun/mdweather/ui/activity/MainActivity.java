@@ -157,6 +157,7 @@ public class MainActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mHeaderContainer.setTransitionName(TRANSITION_NAME);
             getWindow().setEnterTransition(makeEnterTransition());
         }
         Intent intent = getIntent();

@@ -77,7 +77,6 @@ public class CityListActivity extends BaseActivity
 
     @Override
     protected void initData() {
-        // TODO: 2016/2/1 从数据库中得到cityIdList用于网络请求
         mCityIdList = MyApplication.getDataSource().getCityIdList();
         mWeatherList = new ArrayList<>();
         position = 0;
@@ -115,7 +114,6 @@ public class CityListActivity extends BaseActivity
         mWeatherList.add(simpleWeather);
         mAdapter.add(simpleWeather);
         position++;
-        // TODO: 2016/2/1 下一个网络请求或者并发请求
         Log.i("xyz", "position --> " + position + "  mCityIdList.size() --> " + mCityIdList.size());
         if (position < mCityIdList.size()) {
             Log.i("xyz", "mCompositeSubscription.add() --> onEventMainThread(SimpleWeatherEvent)");
@@ -139,10 +137,8 @@ public class CityListActivity extends BaseActivity
         String cityId = cityList.getRetData().get(0).getArea_id();
         if (cityId == null) return;
         Log.i("xyz", "cityID --> " + cityId + "  cityName --> " + cityName);
-        // TODO: 2016/2/1 加入到数据库中
         MyApplication.getDataSource().insert(cityName, cityId);
         mCityIdList.add(cityId);
-        // TODO: 2016/2/1 可以使用AlertDialog选择城市
         Log.i("xyz", "mCompositeSubscription.add() --> onEventMainThread(CityListEvent)");
         mCompositeSubscription.add(RxMethod.getWeatherForList(cityId));
     }
@@ -189,7 +185,6 @@ public class CityListActivity extends BaseActivity
                 }
             });
         }
-        // TODO: 2016/2/1 searchView未知错误，空指针考虑自定义
         return super.onCreateOptionsMenu(menu);
     }
 
