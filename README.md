@@ -5,8 +5,6 @@ MDWeather
 ### 数据来源
 [天气查询](http://apistore.baidu.com/apiworks/servicedetail/112.html "百度的api store")  百度的api store中的一个关于天气的api
 ### 截图
-![](https://github.com/sanousun/MDWeather/blob/master/screenshot/Screenshot_001.png "主界面")
-![](https://github.com/sanousun/MDWeather/blob/master/screenshot/Screenshot_002.png "城市天气界面头部")
-![](https://github.com/sanousun/MDWeather/blob/master/screenshot/Screenshot_003.png "城市天气界面内容")
+![](https://github.com/sanousun/MDWeather/blob/master/screenshot/screenshot.jpg)
 ### 另一个app的地址
 [豆瓣电影](https://github.com/sanousun/DoubanFilm)
