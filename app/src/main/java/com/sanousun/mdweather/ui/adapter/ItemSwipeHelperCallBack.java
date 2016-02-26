@@ -24,12 +24,18 @@ public class ItemSwipeHelperCallBack extends ItemTouchHelper.Callback {
     @Override
     public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
         int dragFlags = 0;
-        int swipeFlags = ItemTouchHelper.LEFT;
+        int swipeFlags;
+        if (viewHolder.getAdapterPosition() == 0) {
+            swipeFlags = 0;
+        } else {
+            swipeFlags = ItemTouchHelper.START;
+        }
         return makeMovementFlags(dragFlags, swipeFlags);
     }
 
     @Override
-    public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+    public boolean onMove(RecyclerView recyclerView,
+                          RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
         return false;
     }
 

@@ -1,38 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:padding="8dp"
-                tools:background="@color/weather_fine">
+                android:padding="16dp">
 
     <ImageView
         android:id="@+id/view_index_iv_icon"
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:layout_marginLeft="24dp"
+        android:layout_centerVertical="true"
         tools:src="@drawable/index_xc"/>
 
     <TextView
         android:id="@+id/view_index_tv_name"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
+        android:layout_marginLeft="48dp"
         android:layout_toRightOf="@id/view_index_iv_icon"
         android:textColor="@color/white"
-        android:textSize="14sp"
-        tools:text="@string/index_carwash"/>
+        android:textSize="16sp"
+        android:textStyle="bold"
+        tools:text="洗车指数--不宜"/>
 
     <TextView
         android:id="@+id/view_index_tv_index"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/view_index_iv_icon"
+        android:layout_marginTop="4dp"
         android:layout_alignLeft="@id/view_index_tv_name"
         android:layout_below="@id/view_index_tv_name"
-        android:gravity="bottom"
         android:textColor="@color/white"
-        android:textSize="16sp"
-        tools:text="不宜"/>
+        android:textSize="14sp"
+        tools:text="不宜不宜不宜不宜不宜不宜不宜不宜不宜不宜不宜不宜不宜不宜不宜不宜不宜不宜不宜不宜不宜不宜不宜"/>
 
 </RelativeLayout>

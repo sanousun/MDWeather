@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView
+    style="@style/cardView"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/cardView"
     app:cardCornerRadius="4dp"
     app:cardElevation="4dp">
 
     <RelativeLayout
         android:id="@+id/city_item_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="208dp"
         tools:background="@drawable/bg_weather_fine">
 
         <TextView
@@ -20,7 +21,17 @@
             android:layout_marginTop="32dp"
             android:textColor="@color/white"
             android:textSize="32sp"
-            tools:text="余杭" />
+            tools:text="余杭"/>
+
+        <ImageView
+            android:id="@+id/city_item_iv_location"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginTop="32dp"
+            android:visibility="visible"
+            android:layout_toRightOf="@id/city_item_tv_city"
+            android:src="@drawable/ic_location"/>
 
         <TextView
             android:id="@+id/city_item_tv_temp"
@@ -32,7 +43,7 @@
             android:textColor="@color/white"
             android:textSize="48sp"
             android:textStyle="bold"
-            tools:text="6°" />
+            tools:text="6°"/>
 
         <TextView
             android:id="@+id/city_item_tv_type"
@@ -44,6 +55,6 @@
             android:layout_toRightOf="@id/city_item_tv_temp"
             android:textColor="@color/white"
             android:textSize="22sp"
-            tools:text="晴" />
+            tools:text="晴"/>
     </RelativeLayout>
 </android.support.v7.widget.CardView>

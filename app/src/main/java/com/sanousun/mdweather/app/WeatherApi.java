@@ -18,4 +18,7 @@ public interface WeatherApi {
 
     @GET("cityid")
     Observable<SimpleWeather> getSimpleWeather(@Query("cityid") String cityId);
+
+    @GET("cityname")
+    Observable<SimpleWeather> getSimpleWeatherForLoc(@Query("cityname") String cityName);
 }

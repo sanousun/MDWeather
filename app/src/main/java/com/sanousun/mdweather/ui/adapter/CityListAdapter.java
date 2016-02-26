@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -19,7 +20,8 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class CityListAdapter
-        extends RecyclerView.Adapter<CityListAdapter.MyViewHolder> {
+        extends RecyclerView.Adapter<CityListAdapter.MyViewHolder>
+        implements ItemSwipeHelperCallBack.ItemSwipeHelperAdapter {
 
     private Context mContext;
     private List<SimpleWeather> mWeatherList = new ArrayList<>();
@@ -54,6 +56,7 @@ public class CityListAdapter
     public void remove(int pos) {
         mWeatherList.remove(pos);
         notifyItemRemoved(pos);
+        mListener.itemRemove(pos);
     }
 
     @Override
@@ -72,6 +75,12 @@ public class CityListAdapter
         return mWeatherList.size();
     }
 
+    @Override
+    public void onItemDismiss(int pos) {
+        if (pos == 0) return;
+        this.remove(pos);
+    }
+
     class MyViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {
 
@@ -79,6 +88,8 @@ public class CityListAdapter
         RelativeLayout mContainer;
         @Bind(R.id.city_item_tv_city)
         TextView mCityName;
+        @Bind(R.id.city_item_iv_location)
+        ImageView mLocationIcon;
         @Bind(R.id.city_item_tv_temp)
         TextView mWeatherTemp;
         @Bind(R.id.city_item_tv_type)
@@ -95,13 +106,17 @@ public class CityListAdapter
         public void update() {
             int pos = getLayoutPosition();
             mWeather = mWeatherList.get(pos);
+            //根据天气，设置背景图片
             int resId = WeatherIconUtil.
                     getBackgroundResId(mContext,
                             mWeather.getRetData().getWeather(),
                             mWeather.getRetData().isNight());
             mContainer.setBackgroundResource(resId);
+            //判断是否属于本地天气，是则将定位icon显示
+            mLocationIcon.setVisibility(
+                    pos == 0 ? View.VISIBLE : View.GONE);
             mCityName.setText(mWeather.getRetData().getCity());
-            mWeatherTemp.setText(mWeather.getRetData().getTemp() + "°");
+            mWeatherTemp.setText(String.format("%s°", mWeather.getRetData().getTemp()));
             mWeatherType.setText(mWeather.getRetData().getWeather());
         }
 
@@ -114,5 +129,7 @@ public class CityListAdapter
 
     public interface OnItemClickListener {
         void itemClick(int pos);
+
+        void itemRemove(int pos);
     }
 }

@@ -4,14 +4,20 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.transition.Fade;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.util.Log;
@@ -43,18 +49,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import butterknife.Bind;
-import butterknife.OnClick;
 import de.greenrobot.event.Subscribe;
 
 // TODO: 2016/2/1 后续考虑加入fragmentAdapter
 // TODO: 2016/2/5 当前版本不作为主启动界面 
-// TODO: 2016/2/13 后续版本需要做主启动界面的话，需要android的定位服务（
-// TODO: 2016/2/13 可以选择易源天气api，通过localManager获得经纬度，得到当地天气；
-// TODO: 2016/2/13 或者通过地图api获得当前城市）
 public class MainActivity extends BaseActivity
-        implements SwipeRefreshLayout.OnRefreshListener, AppBarLayout.OnOffsetChangedListener {
+        implements SwipeRefreshLayout.OnRefreshListener,
+        AppBarLayout.OnOffsetChangedListener {
 
-    private static final String TRANSITION_NAME = "sharedView";
+    private static final String IS_LOCATION = "is_location?";
     private static final String CITY_ID = "city_id";
     private static final String CITY_NAME = "city_name";
     private static final String WEATHER_TYPE = "weather_type";
@@ -96,8 +99,9 @@ public class MainActivity extends BaseActivity
     @Bind(R.id.main_view_aqi)
     AirQualityIndexView mAqiView;
     //---------weather index----------
+    @Bind(R.id.main_index_container)
+    LinearLayout mIndexContainer;
     private Map<String, View> mIndexViews = new HashMap<>();
-
     @Bind(R.id.main_view_gm)
     View mGanMaoView;
     @Bind(R.id.main_view_fs)
@@ -117,35 +121,24 @@ public class MainActivity extends BaseActivity
      */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private Transition makeEnterTransition() {
-        Transition transition = new Slide(Gravity.BOTTOM);
-        transition.addTarget(mContentContainer);
-        transition.setDuration(400);
-        return transition;
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private static void startActivityWithSharedElement(
-            Activity activity, Intent intent, View sharedElement) {
-        sharedElement.setTransitionName(TRANSITION_NAME);
-        activity.startActivity(intent,
-                ActivityOptions.makeSceneTransitionAnimation(
-                        activity, sharedElement, sharedElement.getTransitionName()).toBundle());
+        Transition t = new Fade();
+        t.setDuration(500);
+        return t;
     }
 
     public static void startActivity(
-            Activity activity, View sharedElement,
+            Activity activity, boolean isLocation,
             String cityId, String cityName,
             String weatherType, Boolean isNight) {
         Intent intent = new Intent(activity, MainActivity.class);
+        intent.putExtra(IS_LOCATION, isLocation);
         intent.putExtra(CITY_ID, cityId);
         intent.putExtra(CITY_NAME, cityName);
         intent.putExtra(WEATHER_TYPE, weatherType);
         intent.putExtra(IS_NIGHT, isNight);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            startActivityWithSharedElement(activity, intent, sharedElement);
-        } else {
-            activity.startActivity(intent);
-        }
+        ActivityOptionsCompat options =
+                ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
+        ActivityCompat.startActivity(activity, intent, options.toBundle());
     }
 
     @Override
@@ -157,7 +150,6 @@ public class MainActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mHeaderContainer.setTransitionName(TRANSITION_NAME);
             getWindow().setEnterTransition(makeEnterTransition());
         }
         Intent intent = getIntent();
@@ -166,10 +158,12 @@ public class MainActivity extends BaseActivity
             mCityName = intent.getStringExtra(CITY_NAME);
             String weatherType = intent.getStringExtra(WEATHER_TYPE);
             Boolean isNight = intent.getBooleanExtra(IS_NIGHT, false);
+            Boolean isLocation = intent.getBooleanExtra(IS_LOCATION, false);
             setBackground(weatherType, isNight);
-            if (getSupportActionBar() != null) {
-                getSupportActionBar().setTitle(mCityName);
-                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            ActionBar actionBar = getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setTitle(mCityName);
+                actionBar.setDisplayHomeAsUpEnabled(true);
             }
         }
         onRefresh();
@@ -195,14 +189,6 @@ public class MainActivity extends BaseActivity
     protected void initEvent() {
         mRefreshLayout.setOnRefreshListener(this);
         mAppbarLayout.addOnOffsetChangedListener(this);
-    }
-
-
-    @OnClick({R.id.main_view_yd, R.id.main_view_ls, R.id.main_view_xc,
-            R.id.main_view_ct, R.id.main_view_gm, R.id.main_view_fs})
-    public void onClickIndex(View v) {
-        new AlertDialog.Builder(this).
-                setTitle("温馨提示：").setMessage((String) v.getTag()).show();
     }
 
     @Override
@@ -287,8 +273,12 @@ public class MainActivity extends BaseActivity
         }
         int colorRes = WeatherIconUtil.getBackColorResId(this, weatherType, isNight);
         if (colorRes != -1) {
-            mContentContainer.setBackgroundColor(ContextCompat.getColor(this, colorRes));
-            mCollapsingTBLayout.setContentScrimColor(ContextCompat.getColor(this, colorRes));
+            int color = ContextCompat.getColor(this, colorRes);
+            mSunR2SView.setBackgroundColor(color);
+            m7dWeatherView.setBackgroundColor(color);
+            mAqiView.setBackgroundColor(color);
+            mIndexContainer.setBackgroundColor(color);
+            mCollapsingTBLayout.setContentScrimColor(color);
         }
     }
 
@@ -346,11 +336,13 @@ public class MainActivity extends BaseActivity
             View v = mIndexViews.get(index.getCode());
             ((ImageView) v.findViewById(R.id.view_index_iv_icon)).
                     setImageResource(WeatherIconUtil.getIndexResId(this, index.getCode()));
+            String text = index.getName() +
+                    (TextUtils.isEmpty(index.getIndex()) ?
+                            "" : ("--" + index.getIndex()));
             ((TextView) v.findViewById(R.id.view_index_tv_name)).
-                    setText(index.getName());
+                    setText(text);
             ((TextView) v.findViewById(R.id.view_index_tv_index)).
-                    setText(index.getIndex());
-            v.setTag(index.getDetails());
+                    setText(index.getDetails());
             Log.i("xyz", "index --> " + index.getName());
         }
         Log.i("xyz", "index --> complete");
@@ -362,11 +354,7 @@ public class MainActivity extends BaseActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
-                    this.finishAfterTransition();
-                } else {
-                    this.finish();
-                }
+                ActivityCompat.finishAfterTransition(this);
         }
         return super.onOptionsItemSelected(item);
     }

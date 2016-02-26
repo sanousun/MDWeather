@@ -90,4 +90,22 @@ public class RxMethod {
                 });
         return subscription;
     }
+
+    public static Subscription getWeatherForLoc(String cityName) {
+        Subscription subscription = WeatherApiFactory.getWeatherApi().getSimpleWeatherForLoc(cityName).
+                subscribeOn(Schedulers.io()).
+                observeOn(AndroidSchedulers.mainThread()).
+                subscribe(new Action1<SimpleWeather>() {
+                    @Override
+                    public void call(SimpleWeather simpleWeather) {
+                        EventBus.getDefault().post(new WeatherForLocEvent(simpleWeather, Result.SUCCESS));
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        EventBus.getDefault().post(new WeatherForLocEvent(null, Result.FAIL));
+                    }
+                });
+        return subscription;
+    }
 }

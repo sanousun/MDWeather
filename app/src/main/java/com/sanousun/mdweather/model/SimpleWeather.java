@@ -213,7 +213,7 @@ public class SimpleWeather {
                 return true;
             }
             if (getSetH() < hour ||
-                    ((getSetH() == hour) && (getSetH() < minute))) {
+                    ((getSetH() == hour) && (getSetM() < minute))) {
                 return true;
             }
             return false;
