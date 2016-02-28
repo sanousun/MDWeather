@@ -47,10 +47,9 @@ public class CityListAdapter
         }
     }
 
-    public void update(List<SimpleWeather> data) {
+    public void removeAll() {
         mWeatherList.clear();
         notifyDataSetChanged();
-        add(data);
     }
 
     public void remove(int pos) {

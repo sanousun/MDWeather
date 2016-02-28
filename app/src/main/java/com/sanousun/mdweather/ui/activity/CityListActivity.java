@@ -3,7 +3,7 @@ package com.sanousun.mdweather.ui.activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -38,19 +38,24 @@ import de.greenrobot.event.Subscribe;
 
 public class CityListActivity extends BaseActivity
         implements CityListAdapter.OnItemClickListener,
+        SwipeRefreshLayout.OnRefreshListener,
         AMapLocationListener {
 
     @Bind(R.id.toolbar)
     Toolbar mToolbar;
-    @Bind(R.id.list_rv_main)
+    @Bind(R.id.list_refresh)
+    SwipeRefreshLayout mRefreshLayout;
+    @Bind(R.id.list_rv)
     RecyclerView mRecyclerView;
 
     private List<String> mCityIdList;
     private List<SimpleWeather> mWeatherList;
     private CityListAdapter mAdapter;
     private SearchView mSearchView;
+    private MenuItem mSearchItem;
 
-    private int position;
+    //用于判断两次返回键的间隔时间
+    private long currentTime = 0;
 
     private AMapLocationClient mLocationClient = null;
 
@@ -67,10 +72,6 @@ public class CityListActivity extends BaseActivity
     @Override
     protected void initView() {
         setSupportActionBar(mToolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mAdapter = new CityListAdapter(this);
@@ -79,6 +80,7 @@ public class CityListActivity extends BaseActivity
         ItemTouchHelper.Callback callback = new ItemSwipeHelperCallBack(mAdapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(mRecyclerView);
+        mRefreshLayout.setRefreshing(true);
     }
 
     @Override
@@ -86,7 +88,6 @@ public class CityListActivity extends BaseActivity
 
         mCityIdList = MyApplication.getDataSource().getCityIdList();
         mWeatherList = new ArrayList<>();
-        position = 0;
         //初始化定位服务
         mLocationClient = new AMapLocationClient(getApplicationContext());
         AMapLocationClientOption option = new AMapLocationClientOption();
@@ -98,7 +99,7 @@ public class CityListActivity extends BaseActivity
 
     @Override
     protected void initEvent() {
-
+        mRefreshLayout.setOnRefreshListener(this);
     }
 
     @Override
@@ -108,6 +109,22 @@ public class CityListActivity extends BaseActivity
             mLocationClient.onDestroy();
         }
     }
+
+    //-----------------------------------------------------------------------------
+    //-------------------SwipeRefreshLayout.OnRefreshListener----------------------
+    //-----------------------------------------------------------------------------
+    @Override
+    public void onRefresh() {
+        mRefreshLayout.setRefreshing(true);
+        mWeatherList = new ArrayList<>();
+        mAdapter.removeAll();
+        mCompositeSubscription.add(
+                RxMethod.getWeatherForList(
+                        mCityIdList.get(mWeatherList.size())));
+    }
+    //-----------------------------------------------------------------------------
+    //--------------------SwipeRefreshLayout.OnRefreshListener---------------------
+    //-----------------------------------------------------------------------------
 
     //-----------------------------------------------------------------------------
     //---------------------------------Event Bus-----------------------------------
@@ -124,18 +141,18 @@ public class CityListActivity extends BaseActivity
             Toast.makeText(this, simpleWeather.getErrMsg(), Toast.LENGTH_SHORT).show();
             return;
         }
+        mCityIdList.add(mWeatherList.size(),
+                simpleWeather.getRetData().getCitycode());
         mWeatherList.add(simpleWeather);
         mAdapter.add(simpleWeather);
         //请求收藏的地名
-        if (mCityIdList.size() != 0) {
-            if (mCityIdList.get(position).equals(mWeatherList.get(0).getRetData().getCitycode())) {
-                mCityIdList.remove(position);
-            }
-            if (position < mCityIdList.size()) {
-                mCompositeSubscription.add(RxMethod.getWeatherForList(mCityIdList.get(position)));
-            }
+        if (getNextCity() == null) {
+            mRefreshLayout.setRefreshing(false);
+        } else {
+            mCompositeSubscription.add(RxMethod.getWeatherForList(getNextCity()));
         }
     }
+
 
     @Subscribe
     public void onEventMainThread(WeatherForListEvent event) {
@@ -150,13 +167,10 @@ public class CityListActivity extends BaseActivity
         }
         mWeatherList.add(simpleWeather);
         mAdapter.add(simpleWeather);
-        position++;
-        //与local city id比较，跳过已经作为自动定位出现的城市
-        if (mCityIdList.get(position).equals(mWeatherList.get(0).getRetData().getCitycode())) {
-            mCityIdList.remove(position);
-        }
-        if (position < mCityIdList.size()) {
-            mCompositeSubscription.add(RxMethod.getWeatherForList(mCityIdList.get(position)));
+        if (getNextCity() == null) {
+            mRefreshLayout.setRefreshing(false);
+        } else {
+            mCompositeSubscription.add(RxMethod.getWeatherForList(getNextCity()));
         }
     }
 
@@ -171,7 +185,10 @@ public class CityListActivity extends BaseActivity
             Toast.makeText(this, cityList.getErrMsg(), Toast.LENGTH_SHORT).show();
             return;
         }
+        mSearchView.setIconified(false);
         mSearchView.clearFocus();
+        MenuItemCompat.collapseActionView(mSearchItem);
+
         String cityName = cityList.getRetData().get(0).getName_cn();
         String cityId = cityList.getRetData().get(0).getArea_id();
         if (cityId == null) return;
@@ -180,10 +197,21 @@ public class CityListActivity extends BaseActivity
         mCompositeSubscription.add(RxMethod.getWeatherForList(cityId));
     }
 
+    /**
+     * 获取下一个city的id,localCityId(mCityIdList.get(0))比较，跳过已经作为自动定位出现的城市
+     */
+    private String getNextCity() {
+        if (mWeatherList.size() >= mCityIdList.size())
+            return null;
+        int pos = mWeatherList.size();
+        if (mCityIdList.get(pos).equals(mCityIdList.get(0)))
+            return getNextCity();
+        return mCityIdList.get(pos);
+    }
+
     //-----------------------------------------------------------------------------
     //---------------------------------Event Bus-----------------------------------
     //-----------------------------------------------------------------------------
-
 
     //-----------------------------------------------------------------------------
     //-------------------CityListAdapter.OnItemClickListener-----------------------
@@ -211,8 +239,9 @@ public class CityListActivity extends BaseActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_citylist, menu);
-        MenuItem item = menu.findItem(R.id.action_search);
-        mSearchView = (SearchView) MenuItemCompat.getActionView(item);
+        mSearchItem = menu.findItem(R.id.action_search);
+        mSearchView = (SearchView) MenuItemCompat.getActionView(mSearchItem);
+        mSearchView.setQueryHint("请输入所要查找的城市...");
         if (mSearchView != null) {
             mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
@@ -220,8 +249,10 @@ public class CityListActivity extends BaseActivity
                     if (MyApplication.getDataSource().getCityId(query) != null) {
                         Toast.makeText(getApplicationContext(),
                                 "城市已存在列表中", Toast.LENGTH_SHORT).show();
+                        mSearchView.setQuery(null, false);
                     } else {
                         mCompositeSubscription.add(RxMethod.getCityList(query));
+                        mRefreshLayout.setRefreshing(true);
                     }
                     return true;
                 }
@@ -236,12 +267,14 @@ public class CityListActivity extends BaseActivity
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                this.finish();
+    public void onBackPressed() {
+        if ((System.currentTimeMillis() - currentTime) < 500) {
+            this.finish();
+        } else {
+            currentTime = System.currentTimeMillis();
+            Toast.makeText(this, "再按一次退出！", Toast.LENGTH_SHORT).show();
         }
-        return super.onOptionsItemSelected(item);
+        super.onBackPressed();
     }
 
     /**
@@ -261,4 +294,6 @@ public class CityListActivity extends BaseActivity
             }
         }
     }
+
+
 }

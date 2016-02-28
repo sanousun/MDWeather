@@ -1,7 +1,5 @@
 package com.sanousun.mdweather.rxmethod;
 
-import android.widget.TextView;
-
 import com.sanousun.mdweather.app.WeatherApiFactory;
 import com.sanousun.mdweather.model.CityList;
 import com.sanousun.mdweather.model.SimpleWeather;
@@ -11,7 +9,6 @@ import de.greenrobot.event.EventBus;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 import static com.sanousun.mdweather.support.Constant.Result;
