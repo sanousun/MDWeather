@@ -2,9 +2,7 @@ package com.sanousun.mdweather.ui.activity;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.ActivityOptions;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -14,14 +12,11 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.transition.Fade;
-import android.transition.Slide;
 import android.transition.Transition;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -33,10 +28,10 @@ import android.widget.Toast;
 import com.sanousun.mdweather.R;
 import com.sanousun.mdweather.model.SimpleWeather;
 import com.sanousun.mdweather.model.Weather;
+import com.sanousun.mdweather.rxmethod.Event;
 import com.sanousun.mdweather.rxmethod.RxMethod;
 import com.sanousun.mdweather.rxmethod.SimpleWeatherEvent;
 import com.sanousun.mdweather.rxmethod.WeatherEvent;
-import com.sanousun.mdweather.support.Constant;
 import com.sanousun.mdweather.support.util.StringUtil;
 import com.sanousun.mdweather.support.util.WeatherIconUtil;
 import com.sanousun.mdweather.ui.widget.AirQualityIndexView;
@@ -164,6 +159,8 @@ public class MainActivity extends BaseActivity
             if (actionBar != null) {
                 actionBar.setTitle(mCityName);
                 actionBar.setDisplayHomeAsUpEnabled(true);
+                if (isLocation)
+                    actionBar.setLogo(R.mipmap.ic_action_location);
             }
         }
         onRefresh();
@@ -206,7 +203,7 @@ public class MainActivity extends BaseActivity
     //----------------------------------------Event Bus ↓-------------------------------------------
     @Subscribe
     public void onEventMainThread(SimpleWeatherEvent event) {
-        if (event.getEventResult() == Constant.Result.FAIL) {
+        if (event.getEventResult() == Event.FAIL) {
             Toast.makeText(this, "wrong network!", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -221,7 +218,7 @@ public class MainActivity extends BaseActivity
 
     @Subscribe
     public void onEventMainThread(WeatherEvent event) {
-        if (event.getEventResult() == Constant.Result.FAIL) {
+        if (event.getEventResult() == Event.FAIL) {
             Toast.makeText(this, "wrong network!", Toast.LENGTH_SHORT).show();
             return;
         }

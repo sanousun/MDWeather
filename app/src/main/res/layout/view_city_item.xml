@@ -27,11 +27,10 @@
             android:id="@+id/city_item_iv_location"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:layout_marginLeft="4dp"
             android:layout_marginTop="32dp"
             android:visibility="visible"
             android:layout_toRightOf="@id/city_item_tv_city"
-            android:src="@drawable/ic_location"/>
+            android:src="@mipmap/ic_action_location"/>
 
         <TextView
             android:id="@+id/city_item_tv_temp"

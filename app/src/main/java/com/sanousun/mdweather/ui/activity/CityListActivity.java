@@ -1,5 +1,6 @@
 package com.sanousun.mdweather.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.MenuItemCompat;
@@ -23,10 +24,10 @@ import com.sanousun.mdweather.app.MyApplication;
 import com.sanousun.mdweather.model.CityList;
 import com.sanousun.mdweather.model.SimpleWeather;
 import com.sanousun.mdweather.rxmethod.CityListEvent;
+import com.sanousun.mdweather.rxmethod.Event;
 import com.sanousun.mdweather.rxmethod.RxMethod;
 import com.sanousun.mdweather.rxmethod.WeatherForListEvent;
 import com.sanousun.mdweather.rxmethod.WeatherForLocEvent;
-import com.sanousun.mdweather.support.Constant;
 import com.sanousun.mdweather.ui.adapter.CityListAdapter;
 import com.sanousun.mdweather.ui.adapter.ItemSwipeHelperCallBack;
 
@@ -71,6 +72,7 @@ public class CityListActivity extends BaseActivity
 
     @Override
     protected void initView() {
+        mToolbar.setTitle(R.string.city_list);
         setSupportActionBar(mToolbar);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -132,7 +134,7 @@ public class CityListActivity extends BaseActivity
 
     @Subscribe
     public void onEventMainThread(WeatherForLocEvent event) {
-        if (event.getEventResult() == Constant.Result.FAIL) {
+        if (event.getEventResult() == Event.FAIL) {
             Toast.makeText(this, "网络错误!", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -156,7 +158,7 @@ public class CityListActivity extends BaseActivity
 
     @Subscribe
     public void onEventMainThread(WeatherForListEvent event) {
-        if (event.getEventResult() == Constant.Result.FAIL) {
+        if (event.getEventResult() == Event.FAIL) {
             Toast.makeText(this, "wrong network!", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -176,7 +178,7 @@ public class CityListActivity extends BaseActivity
 
     @Subscribe
     public void onEventMainThread(CityListEvent event) {
-        if (event.getEventResult() == Constant.Result.FAIL) {
+        if (event.getEventResult() == Event.FAIL) {
             Toast.makeText(this, "wrong network!", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -227,7 +229,7 @@ public class CityListActivity extends BaseActivity
 
     @Override
     public void itemRemove(int pos) {
-        String cityId = mCityIdList.remove(pos - 1);
+        String cityId = mCityIdList.remove(pos);
         MyApplication.getDataSource().delete(cityId);
         mWeatherList.remove(pos);
     }
@@ -264,6 +266,16 @@ public class CityListActivity extends BaseActivity
             });
         }
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_about) {
+            Intent intent = new Intent(this, AboutActivity.class);
+            startActivity(intent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

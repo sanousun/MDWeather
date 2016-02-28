@@ -40,13 +40,6 @@ public class CityListAdapter
         notifyItemInserted(mWeatherList.size());
     }
 
-    public void add(List<SimpleWeather> data) {
-        for (int i = 0; i < data.size(); i++) {
-            mWeatherList.add(data.get(i));
-            notifyItemInserted(i);
-        }
-    }
-
     public void removeAll() {
         mWeatherList.clear();
         notifyDataSetChanged();
@@ -60,7 +53,8 @@ public class CityListAdapter
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(mContext).inflate(R.layout.view_city_item, parent, false);
+        View v = LayoutInflater.from(mContext).
+                inflate(R.layout.view_city_item, parent, false);
         return new MyViewHolder(v);
     }
 

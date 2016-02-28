@@ -1,12 +1,13 @@
 package com.sanousun.mdweather.rxmethod;
 
-import com.sanousun.mdweather.support.Constant.Result;
-
 public class Event {
 
-    protected Result mEventResult;
+    public static final int SUCCESS = 0;
+    public static final int FAIL = 1;
 
-    public Result getEventResult() {
+    protected int mEventResult;
+
+    public int getEventResult() {
         return mEventResult;
     }
 }
