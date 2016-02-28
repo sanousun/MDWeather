@@ -57,7 +57,7 @@ public class SunRiseToSetView extends View {
     private void init() {
         sunrise = new Clock(6, 0);
         sunset = new Clock(18, 0);
-        now = new Clock(14, 0);
+        now = new Clock(0, 0);
         iconWidth = DensityUtil.dip2px(getContext(), 48f);
         clockRadio = DensityUtil.dip2px(getContext(), 16f);
 

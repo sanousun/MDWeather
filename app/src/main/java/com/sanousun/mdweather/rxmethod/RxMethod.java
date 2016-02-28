@@ -11,8 +11,6 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
-import static com.sanousun.mdweather.support.Constant.Result;
-
 public class RxMethod {
 
     public static Subscription getCityList(String cityName) {
@@ -22,12 +20,12 @@ public class RxMethod {
                 subscribe(new Action1<CityList>() {
                     @Override
                     public void call(CityList cityList) {
-                        EventBus.getDefault().post(new CityListEvent(cityList, Result.SUCCESS));
+                        EventBus.getDefault().post(new CityListEvent(cityList, Event.SUCCESS));
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        EventBus.getDefault().post(new CityListEvent(null, Result.FAIL));
+                        EventBus.getDefault().post(new CityListEvent(null,Event.FAIL));
                     }
                 });
         return subscription;
@@ -41,12 +39,12 @@ public class RxMethod {
                 subscribe(new Action1<SimpleWeather>() {
                     @Override
                     public void call(SimpleWeather simpleWeather) {
-                        EventBus.getDefault().post(new SimpleWeatherEvent(simpleWeather, Result.SUCCESS));
+                        EventBus.getDefault().post(new SimpleWeatherEvent(simpleWeather, Event.SUCCESS));
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        EventBus.getDefault().post(new SimpleWeatherEvent(null, Result.FAIL));
+                        EventBus.getDefault().post(new SimpleWeatherEvent(null, Event.FAIL));
                     }
                 });
         return subscription;
@@ -59,12 +57,12 @@ public class RxMethod {
                 subscribe(new Action1<Weather>() {
                     @Override
                     public void call(Weather weather) {
-                        EventBus.getDefault().post(new WeatherEvent(weather, Result.SUCCESS));
+                        EventBus.getDefault().post(new WeatherEvent(weather, Event.SUCCESS));
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        EventBus.getDefault().post(new WeatherEvent(null, Result.FAIL));
+                        EventBus.getDefault().post(new WeatherEvent(null, Event.FAIL));
                     }
                 });
         return subscription;
@@ -77,12 +75,12 @@ public class RxMethod {
                 subscribe(new Action1<SimpleWeather>() {
                     @Override
                     public void call(SimpleWeather simpleWeather) {
-                        EventBus.getDefault().post(new WeatherForListEvent(simpleWeather, Result.SUCCESS));
+                        EventBus.getDefault().post(new WeatherForListEvent(simpleWeather, Event.SUCCESS));
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        EventBus.getDefault().post(new WeatherForListEvent(null, Result.FAIL));
+                        EventBus.getDefault().post(new WeatherForListEvent(null, Event.FAIL));
                     }
                 });
         return subscription;
@@ -95,12 +93,12 @@ public class RxMethod {
                 subscribe(new Action1<SimpleWeather>() {
                     @Override
                     public void call(SimpleWeather simpleWeather) {
-                        EventBus.getDefault().post(new WeatherForLocEvent(simpleWeather, Result.SUCCESS));
+                        EventBus.getDefault().post(new WeatherForLocEvent(simpleWeather, Event.SUCCESS));
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        EventBus.getDefault().post(new WeatherForLocEvent(null, Result.FAIL));
+                        EventBus.getDefault().post(new WeatherForLocEvent(null, Event.FAIL));
                     }
                 });
         return subscription;

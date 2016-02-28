@@ -1,5 +1,7 @@
 package com.sanousun.mdweather.ui.activity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.MenuItemCompat;
@@ -14,19 +16,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
-import com.amap.api.location.AMapLocationClientOption;
-import com.amap.api.location.AMapLocationListener;
 import com.sanousun.mdweather.R;
 import com.sanousun.mdweather.app.MyApplication;
 import com.sanousun.mdweather.model.CityList;
 import com.sanousun.mdweather.model.SimpleWeather;
 import com.sanousun.mdweather.rxmethod.CityListEvent;
+import com.sanousun.mdweather.rxmethod.Event;
 import com.sanousun.mdweather.rxmethod.RxMethod;
 import com.sanousun.mdweather.rxmethod.WeatherForListEvent;
-import com.sanousun.mdweather.rxmethod.WeatherForLocEvent;
-import com.sanousun.mdweather.support.Constant;
+import com.sanousun.mdweather.support.util.DensityUtil;
 import com.sanousun.mdweather.ui.adapter.CityListAdapter;
 import com.sanousun.mdweather.ui.adapter.ItemSwipeHelperCallBack;
 
@@ -38,8 +37,9 @@ import de.greenrobot.event.Subscribe;
 
 public class CityListActivity extends BaseActivity
         implements CityListAdapter.OnItemClickListener,
-        SwipeRefreshLayout.OnRefreshListener,
-        AMapLocationListener {
+        SwipeRefreshLayout.OnRefreshListener {
+
+    private static final String LOCAL_CITY = "local_city";
 
     @Bind(R.id.toolbar)
     Toolbar mToolbar;
@@ -59,6 +59,17 @@ public class CityListActivity extends BaseActivity
 
     private AMapLocationClient mLocationClient = null;
 
+    public static void toActivity(Context context) {
+        Intent intent = new Intent(context, CityListActivity.class);
+        context.startActivity(intent);
+    }
+
+    public static void toActivity(Context context, String localCity) {
+        Intent intent = new Intent(context, CityListActivity.class);
+        intent.putExtra(LOCAL_CITY, localCity);
+        context.startActivity(intent);
+    }
+
     @Override
     protected int getLayoutResID() {
         return R.layout.activity_citylist;
@@ -67,10 +78,12 @@ public class CityListActivity extends BaseActivity
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.onRefresh();
     }
 
     @Override
     protected void initView() {
+        mToolbar.setTitle(R.string.city_list);
         setSupportActionBar(mToolbar);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -85,20 +98,17 @@ public class CityListActivity extends BaseActivity
 
     @Override
     protected void initData() {
-
-        mCityIdList = MyApplication.getDataSource().getCityIdList();
+        mCityIdList = new ArrayList<>();
+        if (getIntent() != null) {
+            mCityIdList.add(getIntent().getStringExtra(LOCAL_CITY));
+        }
+        mCityIdList.addAll(MyApplication.getDataSource().getCityIdList());
         mWeatherList = new ArrayList<>();
-        //初始化定位服务
-        mLocationClient = new AMapLocationClient(getApplicationContext());
-        AMapLocationClientOption option = new AMapLocationClientOption();
-        option.setOnceLocation(true);
-        mLocationClient.setLocationOption(option);
-        mLocationClient.setLocationListener(this);
-        mLocationClient.startLocation();
     }
 
     @Override
     protected void initEvent() {
+        mRefreshLayout.setProgressViewOffset(false, 0, DensityUtil.dip2px(this, 48));
         mRefreshLayout.setOnRefreshListener(this);
     }
 
@@ -129,35 +139,10 @@ public class CityListActivity extends BaseActivity
     //-----------------------------------------------------------------------------
     //---------------------------------Event Bus-----------------------------------
     //-----------------------------------------------------------------------------
-
-    @Subscribe
-    public void onEventMainThread(WeatherForLocEvent event) {
-        if (event.getEventResult() == Constant.Result.FAIL) {
-            Toast.makeText(this, "网络错误!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        SimpleWeather simpleWeather = event.getSimpleWeather();
-        if (simpleWeather.getErrNum() != 0) {
-            Toast.makeText(this, simpleWeather.getErrMsg(), Toast.LENGTH_SHORT).show();
-            return;
-        }
-        mCityIdList.add(mWeatherList.size(),
-                simpleWeather.getRetData().getCitycode());
-        mWeatherList.add(simpleWeather);
-        mAdapter.add(simpleWeather);
-        //请求收藏的地名
-        if (getNextCity() == null) {
-            mRefreshLayout.setRefreshing(false);
-        } else {
-            mCompositeSubscription.add(RxMethod.getWeatherForList(getNextCity()));
-        }
-    }
-
-
     @Subscribe
     public void onEventMainThread(WeatherForListEvent event) {
-        if (event.getEventResult() == Constant.Result.FAIL) {
-            Toast.makeText(this, "wrong network!", Toast.LENGTH_SHORT).show();
+        if (event.getEventResult() == Event.FAIL) {
+            Toast.makeText(this, "未知网络错误!", Toast.LENGTH_SHORT).show();
             return;
         }
         SimpleWeather simpleWeather = event.getSimpleWeather();
@@ -176,8 +161,8 @@ public class CityListActivity extends BaseActivity
 
     @Subscribe
     public void onEventMainThread(CityListEvent event) {
-        if (event.getEventResult() == Constant.Result.FAIL) {
-            Toast.makeText(this, "wrong network!", Toast.LENGTH_SHORT).show();
+        if (event.getEventResult() == Event.FAIL) {
+            Toast.makeText(this, "未知网络错误!", Toast.LENGTH_SHORT).show();
             return;
         }
         CityList cityList = event.getCityList();
@@ -227,7 +212,7 @@ public class CityListActivity extends BaseActivity
 
     @Override
     public void itemRemove(int pos) {
-        String cityId = mCityIdList.remove(pos - 1);
+        String cityId = mCityIdList.remove(pos);
         MyApplication.getDataSource().delete(cityId);
         mWeatherList.remove(pos);
     }
@@ -267,6 +252,16 @@ public class CityListActivity extends BaseActivity
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_about) {
+            Intent intent = new Intent(this, AboutActivity.class);
+            startActivity(intent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onBackPressed() {
         if ((System.currentTimeMillis() - currentTime) < 500) {
             this.finish();
@@ -276,24 +271,4 @@ public class CityListActivity extends BaseActivity
         }
         super.onBackPressed();
     }
-
-    /**
-     * 高德地图定位服务的api回调接口
-     */
-    @Override
-    public void onLocationChanged(AMapLocation aMapLocation) {
-        if (aMapLocation != null) {
-            if (aMapLocation.getErrorCode() == 0) {
-                String city = aMapLocation.getCity();
-                String cityName = city.substring(0, city.length() - 1);
-                mCompositeSubscription.add(RxMethod.getWeatherForLoc(cityName));
-            } else {
-                //显示错误信息
-                Toast.makeText(getApplicationContext(),
-                        aMapLocation.getErrorInfo(), Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-
 }

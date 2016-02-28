@@ -2,9 +2,7 @@ package com.sanousun.mdweather.ui.activity;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.ActivityOptions;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -14,14 +12,13 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.transition.Fade;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -30,13 +27,19 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationClient;
+import com.amap.api.location.AMapLocationClientOption;
+import com.amap.api.location.AMapLocationListener;
 import com.sanousun.mdweather.R;
 import com.sanousun.mdweather.model.SimpleWeather;
 import com.sanousun.mdweather.model.Weather;
+import com.sanousun.mdweather.rxmethod.Event;
 import com.sanousun.mdweather.rxmethod.RxMethod;
 import com.sanousun.mdweather.rxmethod.SimpleWeatherEvent;
 import com.sanousun.mdweather.rxmethod.WeatherEvent;
-import com.sanousun.mdweather.support.Constant;
+import com.sanousun.mdweather.rxmethod.WeatherForLocEvent;
+import com.sanousun.mdweather.support.util.DensityUtil;
 import com.sanousun.mdweather.support.util.StringUtil;
 import com.sanousun.mdweather.support.util.WeatherIconUtil;
 import com.sanousun.mdweather.ui.widget.AirQualityIndexView;
@@ -51,11 +54,14 @@ import java.util.Map;
 import butterknife.Bind;
 import de.greenrobot.event.Subscribe;
 
+import static com.sanousun.mdweather.ui.widget.SunRiseToSetView.*;
+
 // TODO: 2016/2/1 后续考虑加入fragmentAdapter
 // TODO: 2016/2/5 当前版本不作为主启动界面 
 public class MainActivity extends BaseActivity
         implements SwipeRefreshLayout.OnRefreshListener,
-        AppBarLayout.OnOffsetChangedListener {
+        AppBarLayout.OnOffsetChangedListener,
+        AMapLocationListener {
 
     private static final String IS_LOCATION = "is_location?";
     private static final String CITY_ID = "city_id";
@@ -65,6 +71,12 @@ public class MainActivity extends BaseActivity
 
     private String mCityId;
     private String mCityName;
+    private boolean isNight;
+    private String mWeatherType;
+    //应用于定位服务
+    private AMapLocationClient mLocationClient;
+    private boolean isLocal;
+    private boolean isLaunched;
 
     @Bind(R.id.main_refresh_layout)
     SwipeRefreshLayout mRefreshLayout;
@@ -77,13 +89,13 @@ public class MainActivity extends BaseActivity
     @Bind(R.id.main_header_container)
     RelativeLayout mHeaderContainer;
     @Bind(R.id.main_tv_temp)
-    TextView mTemp;
+    TextView mTempText;
     @Bind(R.id.main_tv_type)
-    TextView mWeatherType;
+    TextView mWeatherTypeText;
     @Bind(R.id.main_tv_temp_hl)
-    TextView mTemp_hl;
+    TextView mTempHLText;
     @Bind(R.id.main_tv_wind)
-    TextView mWind;
+    TextView mWindText;
 
     @Bind(R.id.main_toolbar)
     Toolbar mToolbar;
@@ -121,7 +133,7 @@ public class MainActivity extends BaseActivity
      */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private Transition makeEnterTransition() {
-        Transition t = new Fade();
+        Transition t = new Slide(Gravity.BOTTOM);
         t.setDuration(500);
         return t;
     }
@@ -153,21 +165,40 @@ public class MainActivity extends BaseActivity
             getWindow().setEnterTransition(makeEnterTransition());
         }
         Intent intent = getIntent();
-        if (intent != null) {
+        Log.i("xyz", "intent.getAction()" + intent.getAction());
+        if (intent.getAction() == null) {
+            isLaunched = false;
+            isLocal = intent.getBooleanExtra(IS_LOCATION, false);
             mCityId = intent.getStringExtra(CITY_ID);
             mCityName = intent.getStringExtra(CITY_NAME);
-            String weatherType = intent.getStringExtra(WEATHER_TYPE);
-            Boolean isNight = intent.getBooleanExtra(IS_NIGHT, false);
-            Boolean isLocation = intent.getBooleanExtra(IS_LOCATION, false);
-            setBackground(weatherType, isNight);
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setTitle(mCityName);
-                actionBar.setDisplayHomeAsUpEnabled(true);
-            }
+            mWeatherType = intent.getStringExtra(WEATHER_TYPE);
+            isNight = intent.getBooleanExtra(IS_NIGHT, false);
+            setActionBar();
+            setBackground();
+            onRefresh();
+        } else {
+            //初始化定位服务
+            isLaunched = true;
+            isLocal = true;
+            mLocationClient = new AMapLocationClient(getApplicationContext());
+            AMapLocationClientOption option = new AMapLocationClientOption();
+            option.setOnceLocation(true);
+            mLocationClient.setLocationOption(option);
+            mLocationClient.setLocationListener(this);
+            mLocationClient.startLocation();
+            mRefreshLayout.setProgressViewOffset(false, 0, DensityUtil.dip2px(this, 48));
+            mRefreshLayout.setRefreshing(true);
         }
-        onRefresh();
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mLocationClient != null) {
+            mLocationClient.onDestroy();
+        }
+    }
+
 
     @Override
     protected void initView() {
@@ -182,7 +213,6 @@ public class MainActivity extends BaseActivity
         mIndexViews.put("xc", mXiCheView);
         mIndexViews.put("ls", mLiangShaiView);
         mIndexViews.put("yd", mYunDongView);
-        // TODO: 2016/2/1 安卓的定位服务可能需要更换易源天气的api
     }
 
     @Override
@@ -205,9 +235,25 @@ public class MainActivity extends BaseActivity
 
     //----------------------------------------Event Bus ↓-------------------------------------------
     @Subscribe
+    public void onEventMainThread(WeatherForLocEvent event) {
+        if (event.getEventResult() == Event.FAIL) {
+            Toast.makeText(this, "未知网络错误!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        SimpleWeather simpleWeather = event.getSimpleWeather();
+        if (simpleWeather.getErrNum() != 0) {
+            Toast.makeText(this, simpleWeather.getErrMsg(), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        updateHeader(simpleWeather);
+        mCityId = simpleWeather.getRetData().getCitycode();
+        mCompositeSubscription.add(RxMethod.getWeather(mCityId));
+    }
+
+    @Subscribe
     public void onEventMainThread(SimpleWeatherEvent event) {
-        if (event.getEventResult() == Constant.Result.FAIL) {
-            Toast.makeText(this, "wrong network!", Toast.LENGTH_SHORT).show();
+        if (event.getEventResult() == Event.FAIL) {
+            Toast.makeText(this, "未知网络错误!", Toast.LENGTH_SHORT).show();
             return;
         }
         SimpleWeather simpleWeather = event.getSimpleWeather();
@@ -221,8 +267,8 @@ public class MainActivity extends BaseActivity
 
     @Subscribe
     public void onEventMainThread(WeatherEvent event) {
-        if (event.getEventResult() == Constant.Result.FAIL) {
-            Toast.makeText(this, "wrong network!", Toast.LENGTH_SHORT).show();
+        if (event.getEventResult() == Event.FAIL) {
+            Toast.makeText(this, "未知网络错误!", Toast.LENGTH_SHORT).show();
             return;
         }
         Weather weather = event.getWeather();
@@ -231,10 +277,36 @@ public class MainActivity extends BaseActivity
             return;
         }
         updateContent(weather);
+        mContentContainer.setVisibility(VISIBLE);
         mRefreshLayout.setRefreshing(false);
         Log.i("xyz", "onRefresh() --> complete");
     }
     //-------------------------------------------Event Bus ↑----------------------------------------
+
+    private void setActionBar() {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(mCityName);
+            if (isLocal)
+                actionBar.setLogo(R.mipmap.ic_action_location);
+        }
+    }
+
+    private void setBackground() {
+        int bgRes = WeatherIconUtil.getBackgroundResId(this, mWeatherType, isNight);
+        if (bgRes != -1) {
+            mHeaderContainer.setBackgroundResource(bgRes);
+        }
+        int colorRes = WeatherIconUtil.getBackColorResId(this, mWeatherType, isNight);
+        if (colorRes != -1) {
+            int color = ContextCompat.getColor(this, colorRes);
+            mSunR2SView.setBackgroundColor(color);
+            m7dWeatherView.setBackgroundColor(color);
+            mAqiView.setBackgroundColor(color);
+            mIndexContainer.setBackgroundColor(color);
+            mCollapsingTBLayout.setContentScrimColor(color);
+        }
+    }
 
     private void updateHeader(SimpleWeather s) {
 
@@ -247,39 +319,23 @@ public class MainActivity extends BaseActivity
         Calendar c = Calendar.getInstance();
         int hour = c.get(Calendar.HOUR_OF_DAY);
         int minute = c.get(Calendar.MINUTE);
-        SunRiseToSetView.Clock now = new SunRiseToSetView.Clock(hour, minute);
-        SunRiseToSetView.Clock sunrise = new SunRiseToSetView.Clock(
-                w.getRiseH(), w.getRiseM());
-        SunRiseToSetView.Clock sunset = new SunRiseToSetView.Clock(
-                w.getSetH(), w.getSetM());
+        Clock now = new Clock(hour, minute);
+        Clock sunrise = new Clock(w.getRiseH(), w.getRiseM());
+        Clock sunset = new Clock(w.getSetH(), w.getSetM());
         //判断当前时间是否是晚上
-        boolean isNight = w.isNight();
-        setBackground(w.getWeather(), isNight);
-        mTemp.setText(String.format("%s°", w.getTemp()));
-        mWeatherType.setText(w.getWeather());
-        mTemp_hl.setText(String.format("%s°/%s°", w.getH_tmp(), w.getL_tmp()));
-        mWind.setText(String.format("%s %s", w.getWD(), w.getWS()));
+        isNight = w.isNight();
+        mWeatherType = w.getWeather();
+        setActionBar();
+        setBackground();
+        mTempText.setText(String.format("%s°", w.getTemp()));
+        mWeatherTypeText.setText(w.getWeather());
+        mTempHLText.setText(String.format("%s°/%s°", w.getH_tmp(), w.getL_tmp()));
+        mWindText.setText(String.format("%s %s", w.getWD(), w.getWS()));
 
         mSunR2SView.setNowClock(sunrise, sunset, now);
         Log.i("xyz", "SunRiseToSetView --> complete");
 
         Log.i("xyz", "updateHeader() --> end");
-    }
-
-    private void setBackground(String weatherType, Boolean isNight) {
-        int bgRes = WeatherIconUtil.getBackgroundResId(this, weatherType, isNight);
-        if (bgRes != -1) {
-            mHeaderContainer.setBackgroundResource(bgRes);
-        }
-        int colorRes = WeatherIconUtil.getBackColorResId(this, weatherType, isNight);
-        if (colorRes != -1) {
-            int color = ContextCompat.getColor(this, colorRes);
-            mSunR2SView.setBackgroundColor(color);
-            m7dWeatherView.setBackgroundColor(color);
-            mAqiView.setBackgroundColor(color);
-            mIndexContainer.setBackgroundColor(color);
-            mCollapsingTBLayout.setContentScrimColor(color);
-        }
     }
 
     private void updateContent(Weather weather) {
@@ -351,11 +407,44 @@ public class MainActivity extends BaseActivity
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 ActivityCompat.finishAfterTransition(this);
+                break;
+            case R.id.action_city_list:
+                if (mCityId == null) {
+                    break;
+                }
+                if (isLaunched) {
+                    CityListActivity.toActivity(this, mCityId);
+                } else {
+                    CityListActivity.toActivity(this);
+                }
+                break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onLocationChanged(AMapLocation aMapLocation) {
+        if (aMapLocation != null) {
+            if (aMapLocation.getErrorCode() == 0) {
+                String city = aMapLocation.getCity();
+                mCityName = city.substring(0, city.length() - 1);
+                mCompositeSubscription.add(RxMethod.getWeatherForLoc(mCityName));
+                Log.i("xyz", "localcity-->" + mCityName);
+            } else {
+                //显示错误信息
+                Toast.makeText(getApplicationContext(),
+                        aMapLocation.getErrorInfo(), Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

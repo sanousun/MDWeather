@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="@string/introduce">
+        <Preference
+            android:summary="@string/summary"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/author">
+        <Preference
+            android:summary="@string/author_introduce"/>
+        <Preference
+            android:key="email"
+            android:title="@string/email_title"
+            android:summary="@string/emai_summary"/>
+        <Preference
+            android:key="github"
+            android:title="@string/github_title"
+            android:summary="@string/github_summary"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="license"
+        android:title="@string/license"/>
+</PreferenceScreen>
