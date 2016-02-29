@@ -54,8 +54,7 @@ public class CityListActivity extends BaseActivity
     private SearchView mSearchView;
     private MenuItem mSearchItem;
 
-    //用于判断两次返回键的间隔时间
-    private long currentTime = 0;
+
 
     private AMapLocationClient mLocationClient = null;
 
@@ -261,14 +260,5 @@ public class CityListActivity extends BaseActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onBackPressed() {
-        if ((System.currentTimeMillis() - currentTime) < 500) {
-            this.finish();
-        } else {
-            currentTime = System.currentTimeMillis();
-            Toast.makeText(this, "再按一次退出！", Toast.LENGTH_SHORT).show();
-        }
-        super.onBackPressed();
-    }
+
 }

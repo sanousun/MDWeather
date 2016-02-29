@@ -78,6 +78,9 @@ public class MainActivity extends BaseActivity
     private boolean isLocal;
     private boolean isLaunched;
 
+    //用于判断两次返回键的间隔时间
+    private long currentTime = 0;
+
     @Bind(R.id.main_refresh_layout)
     SwipeRefreshLayout mRefreshLayout;
     @Bind(R.id.main_appbar_layout)
@@ -446,5 +449,16 @@ public class MainActivity extends BaseActivity
                         aMapLocation.getErrorInfo(), Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if ((System.currentTimeMillis() - currentTime) < 500) {
+            this.finish();
+        } else {
+            currentTime = System.currentTimeMillis();
+            Toast.makeText(this, "再按一次退出！", Toast.LENGTH_SHORT).show();
+        }
+        super.onBackPressed();
     }
 }
