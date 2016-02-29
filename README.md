@@ -14,6 +14,7 @@ MDWeather
 ##计划
 最近一次上传添加了本地天气的获取，
 采用了高德地图的sdk。<br/>
+2016/2/29 将主启动界面更换成了本地天气界面<br/>
 以后会更新一次ui设计，考虑会更换图标，敬请期待。
 ## 数据来源
 [天气查询](http://apistore.baidu.com/apiworks/servicedetail/112.html "百度的api store")  百度的api store中的一个关于天气的api
