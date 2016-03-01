@@ -35,4 +35,5 @@ dependencies {
     compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta3'
     compile 'com.squareup.retrofit2:adapter-rxjava:2.0.0-beta3'
     compile files('libs/AMap_Location_v2.3.0_20160112.jar')
+    compile 'de.psdev.licensesdialog:licensesdialog:1.8.0'
 }

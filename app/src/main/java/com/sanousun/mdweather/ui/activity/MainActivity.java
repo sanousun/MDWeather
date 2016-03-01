@@ -14,10 +14,9 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.transition.Slide;
+import android.transition.Fade;
 import android.transition.Transition;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -136,7 +135,7 @@ public class MainActivity extends BaseActivity
      */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private Transition makeEnterTransition() {
-        Transition t = new Slide(Gravity.BOTTOM);
+        Transition t = new Fade();
         t.setDuration(500);
         return t;
     }
@@ -292,6 +291,8 @@ public class MainActivity extends BaseActivity
             actionBar.setTitle(mCityName);
             if (isLocal)
                 actionBar.setLogo(R.mipmap.ic_action_location);
+            if (!isLaunched)
+                actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
 
@@ -431,6 +432,9 @@ public class MainActivity extends BaseActivity
                     CityListActivity.toActivity(this);
                 }
                 break;
+            case R.id.action_main_about:
+                Intent intent = new Intent(this, AboutActivity.class);
+                startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }
