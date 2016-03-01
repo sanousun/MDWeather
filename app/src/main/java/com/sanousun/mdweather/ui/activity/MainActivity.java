@@ -463,6 +463,5 @@ public class MainActivity extends BaseActivity
             currentTime = System.currentTimeMillis();
             Toast.makeText(this, "再按一次退出！", Toast.LENGTH_SHORT).show();
         }
-        super.onBackPressed();
     }
 }
