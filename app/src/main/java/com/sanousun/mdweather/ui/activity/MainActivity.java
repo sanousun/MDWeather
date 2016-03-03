@@ -16,7 +16,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.transition.Fade;
 import android.transition.Transition;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -56,7 +55,6 @@ import de.greenrobot.event.Subscribe;
 import static com.sanousun.mdweather.ui.widget.SunRiseToSetView.*;
 
 // TODO: 2016/2/1 后续考虑加入fragmentAdapter
-// TODO: 2016/2/5 当前版本不作为主启动界面 
 public class MainActivity extends BaseActivity
         implements SwipeRefreshLayout.OnRefreshListener,
         AppBarLayout.OnOffsetChangedListener,
@@ -167,7 +165,6 @@ public class MainActivity extends BaseActivity
             getWindow().setEnterTransition(makeEnterTransition());
         }
         Intent intent = getIntent();
-        Log.i("xyz", "intent.getAction()" + intent.getAction());
         if (intent.getAction() == null) {
             isLaunched = false;
             isLocal = intent.getBooleanExtra(IS_LOCATION, false);
@@ -225,7 +222,6 @@ public class MainActivity extends BaseActivity
 
     @Override
     public void onRefresh() {
-        Log.i("xyz", "onRefresh() --> start");
         mRefreshLayout.setRefreshing(true);
         mCompositeSubscription.add(RxMethod.getSimpleWeather(mCityId));
     }
@@ -281,7 +277,6 @@ public class MainActivity extends BaseActivity
         updateContent(weather);
         mContentContainer.setVisibility(VISIBLE);
         mRefreshLayout.setRefreshing(false);
-        Log.i("xyz", "onRefresh() --> complete");
     }
     //-------------------------------------------Event Bus ↑----------------------------------------
 
@@ -314,9 +309,6 @@ public class MainActivity extends BaseActivity
 
     private void updateHeader(SimpleWeather s) {
 
-        Log.i("xyz", "updateHeader() --> start");
-
-        Log.i("xyz", "SunRiseToSetView --> set");
         SimpleWeather.RetDataEntity w = s.getRetData();
         if (w == null) return;
         //得到RunRiseToSetView所需要的数据
@@ -337,17 +329,12 @@ public class MainActivity extends BaseActivity
         mWindText.setText(String.format("%s %s", w.getWD(), w.getWS()));
 
         mSunR2SView.setNowClock(sunrise, sunset, now);
-        Log.i("xyz", "SunRiseToSetView --> complete");
-
-        Log.i("xyz", "updateHeader() --> end");
     }
 
     private void updateContent(Weather weather) {
-        Log.i("xyz", "updateContent() --> start");
         Weather.RetDataEntity w = weather.getRetData();
         if (w == null) return;
         //得到SevenDayWeatherView所需要的数据
-        Log.i("xyz", "SevenDayWeatherView --> set");
         WeatherHolder[] whs = new WeatherHolder[7];
         int k = 0;
         while (k < 2) {
@@ -384,14 +371,10 @@ public class MainActivity extends BaseActivity
             whs[k++] = wh;
         }
         m7dWeatherView.setWeatherData(whs);
-        Log.i("xyz", "SevenDayWeatherView --> complete");
 
-        Log.i("xyz", "AirQualityIndexView --> set");
         mAqiView.setAqi(StringUtil.getAqi(todayEntity.getAqi()));
-        Log.i("xyz", "AirQualityIndexView --> complete");
 
         //设置生活指数
-        Log.i("xyz", "index --> set");
         for (Weather.RetDataEntity.TodayEntity.IndexEntity index : w.getToday().getIndex()) {
             View v = mIndexViews.get(index.getCode());
             ((ImageView) v.findViewById(R.id.view_index_iv_icon)).
@@ -403,11 +386,7 @@ public class MainActivity extends BaseActivity
                     setText(text);
             ((TextView) v.findViewById(R.id.view_index_tv_index)).
                     setText(index.getDetails());
-            Log.i("xyz", "index --> " + index.getName());
         }
-        Log.i("xyz", "index --> complete");
-
-        Log.i("xyz", "updateContent() --> end");
     }
 
     @Override
@@ -430,6 +409,7 @@ public class MainActivity extends BaseActivity
                     CityListActivity.toActivity(this, mCityId);
                 } else {
                     CityListActivity.toActivity(this);
+                    this.finish();
                 }
                 break;
             case R.id.action_main_about:
@@ -446,7 +426,6 @@ public class MainActivity extends BaseActivity
                 String city = aMapLocation.getCity();
                 mCityName = city.substring(0, city.length() - 1);
                 mCompositeSubscription.add(RxMethod.getWeatherForLoc(mCityName));
-                Log.i("xyz", "localcity-->" + mCityName);
             } else {
                 //显示错误信息
                 Toast.makeText(getApplicationContext(),
@@ -457,7 +436,10 @@ public class MainActivity extends BaseActivity
 
     @Override
     public void onBackPressed() {
-        if ((System.currentTimeMillis() - currentTime) < 500) {
+        if(!isLaunched){
+            super.onBackPressed();
+        }
+        if ((System.currentTimeMillis() - currentTime) < 2000) {
             this.finish();
         } else {
             currentTime = System.currentTimeMillis();
