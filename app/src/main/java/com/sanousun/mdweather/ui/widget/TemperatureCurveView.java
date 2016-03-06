@@ -12,9 +12,6 @@ import android.view.View;
 import static android.graphics.Paint.*;
 import static java.lang.Math.*;
 
-/**
- * Created by sanousun on 2016/1/1.
- */
 public class TemperatureCurveView extends View {
 
     private float smooth_value = 1.0f;
