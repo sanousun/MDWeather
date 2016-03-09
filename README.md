@@ -16,7 +16,7 @@ MDWeather
 采用了高德地图的sdk。<br/>
 2016/2/29 将主启动界面更换成了本地天气界面<br/>
 2016/3/1 应用初步完成<br/>
-design support 23.2兼容vector drawable animator, 可以考虑将背景图转化为动态图
+design support 23.2兼容animated vector drawables, 可以考虑将背景图转化为动态图
 ## 数据来源
 [天气查询](http://apistore.baidu.com/apiworks/servicedetail/112.html "百度的api store")  百度的api store中的一个关于天气的api
 ## 截图
