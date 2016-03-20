@@ -1,106 +1,114 @@
 package com.sanousun.mdweather.rxmethod;
 
+import android.util.Log;
+
 import com.sanousun.mdweather.app.WeatherApiFactory;
-import com.sanousun.mdweather.model.CityList;
-import com.sanousun.mdweather.model.SimpleWeather;
-import com.sanousun.mdweather.model.Weather;
+import com.sanousun.mdweather.model.BaseResponse;
 
 import de.greenrobot.event.EventBus;
+import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
+/**
+ * 数据有问题，当返回错误时会返回数组导致gson解析错误
+ */
 public class RxMethod {
 
-    public static Subscription getCityList(String cityName) {
-        Subscription subscription = WeatherApiFactory.getWeatherApi().getCityList(cityName).
-                subscribeOn(Schedulers.io()).
-                observeOn(AndroidSchedulers.mainThread()).
-                subscribe(new Action1<CityList>() {
+    public static Subscription getCityList(String cityName, ErrorVerify errorVerify) {
+        return WeatherApiFactory.getWeatherApi().getCityList(cityName).
+                compose(composeFilter(errorVerify)).
+                subscribe(new Action1<BaseResponse>() {
                     @Override
-                    public void call(CityList cityList) {
-                        EventBus.getDefault().post(new CityListEvent(cityList, Event.SUCCESS));
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        EventBus.getDefault().post(new CityListEvent(null,Event.FAIL));
+                    public void call(BaseResponse baseResponse) {
+                        EventBus.getDefault().post(baseResponse.getRetData());
                     }
                 });
-        return subscription;
-
     }
 
-    public static Subscription getSimpleWeather(String cityId) {
-        Subscription subscription = WeatherApiFactory.getWeatherApi().getSimpleWeather(cityId).
-                subscribeOn(Schedulers.io()).
-                observeOn(AndroidSchedulers.mainThread()).
-                subscribe(new Action1<SimpleWeather>() {
+    public static Subscription getSimpleWeather(String cityId, ErrorVerify errorVerify) {
+        return WeatherApiFactory.getWeatherApi().getSimpleWeather(cityId).
+                compose(composeFilter(errorVerify)).
+                subscribe(new Action1<BaseResponse>() {
                     @Override
-                    public void call(SimpleWeather simpleWeather) {
-                        EventBus.getDefault().post(new SimpleWeatherEvent(simpleWeather, Event.SUCCESS));
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        EventBus.getDefault().post(new SimpleWeatherEvent(null, Event.FAIL));
+                    public void call(BaseResponse baseResponse) {
+                        EventBus.getDefault().post(baseResponse.getRetData());
                     }
                 });
-        return subscription;
     }
 
-    public static Subscription getWeather(String cityId) {
-        Subscription subscription = WeatherApiFactory.getWeatherApi().getWeather(cityId).
-                subscribeOn(Schedulers.io()).
-                observeOn(AndroidSchedulers.mainThread()).
-                subscribe(new Action1<Weather>() {
+    public static Subscription getWeather(String cityId, ErrorVerify errorVerify) {
+        return WeatherApiFactory.getWeatherApi().getWeather(cityId).
+                compose(composeFilter(errorVerify)).
+                subscribe(new Action1<BaseResponse>() {
                     @Override
-                    public void call(Weather weather) {
-                        EventBus.getDefault().post(new WeatherEvent(weather, Event.SUCCESS));
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        EventBus.getDefault().post(new WeatherEvent(null, Event.FAIL));
+                    public void call(BaseResponse baseResponse) {
+                        EventBus.getDefault().post(baseResponse.getRetData());
                     }
                 });
-        return subscription;
     }
 
-    public static Subscription getWeatherForList(String cityId) {
-        Subscription subscription = WeatherApiFactory.getWeatherApi().getSimpleWeather(cityId).
-                subscribeOn(Schedulers.io()).
-                observeOn(AndroidSchedulers.mainThread()).
-                subscribe(new Action1<SimpleWeather>() {
+    public static Subscription getWeatherForList(String cityId, ErrorVerify errorVerify) {
+        return WeatherApiFactory.getWeatherApi().getSimpleWeatherForList(cityId).
+                compose(composeFilter(errorVerify)).
+                subscribe(new Action1<BaseResponse>() {
                     @Override
-                    public void call(SimpleWeather simpleWeather) {
-                        EventBus.getDefault().post(new WeatherForListEvent(simpleWeather, Event.SUCCESS));
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        EventBus.getDefault().post(new WeatherForListEvent(null, Event.FAIL));
+                    public void call(BaseResponse baseResponse) {
+                        EventBus.getDefault().post(baseResponse.getRetData());
                     }
                 });
-        return subscription;
     }
 
-    public static Subscription getWeatherForLoc(String cityName) {
-        Subscription subscription = WeatherApiFactory.getWeatherApi().getSimpleWeatherForLoc(cityName).
-                subscribeOn(Schedulers.io()).
-                observeOn(AndroidSchedulers.mainThread()).
-                subscribe(new Action1<SimpleWeather>() {
+    public static Subscription getWeatherForLoc(String cityName, ErrorVerify errorVerify) {
+        return WeatherApiFactory.getWeatherApi().getSimpleWeatherForLoc(cityName).
+                compose(composeFilter(errorVerify)).
+                subscribe(new Action1<BaseResponse>() {
                     @Override
-                    public void call(SimpleWeather simpleWeather) {
-                        EventBus.getDefault().post(new WeatherForLocEvent(simpleWeather, Event.SUCCESS));
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        EventBus.getDefault().post(new WeatherForLocEvent(null, Event.FAIL));
+                    public void call(BaseResponse baseResponse) {
+                        EventBus.getDefault().post(baseResponse.getRetData());
                     }
                 });
-        return subscription;
     }
+
+    private static Func1<BaseResponse, Boolean> errorFilter(final ErrorVerify errorVerify) {
+        return new Func1<BaseResponse, Boolean>() {
+            @Override
+            public Boolean call(BaseResponse baseResponse) {
+                if (baseResponse == null) {
+                    return false;
+                }
+                if (!baseResponse.isSuc()) {
+                    errorVerify.call(baseResponse.getErrMsg());
+                    Log.i("xyz", baseResponse.getErrMsg());
+                    return false;
+                }
+                return true;
+            }
+        };
+    }
+
+    private static Observable.Transformer<BaseResponse, BaseResponse> composeFilter(
+            final ErrorVerify errVerify) {
+        return new Observable.Transformer<BaseResponse, BaseResponse>() {
+            @Override
+            public Observable<BaseResponse> call(Observable<BaseResponse> baseResponseObservable) {
+                return baseResponseObservable.subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .onErrorReturn(
+                                new Func1<Throwable, BaseResponse>() {
+                                    @Override
+                                    public BaseResponse call(Throwable throwable) {
+                                        Log.i("xyz", throwable.toString());
+                                        errVerify.errorNetwork(throwable);
+                                        return null;
+                                    }
+                                })
+                        .filter(errorFilter(errVerify));
+            }
+        };
+    }
+
 }

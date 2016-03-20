@@ -4,13 +4,13 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -30,14 +30,13 @@ import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 import com.sanousun.mdweather.R;
-import com.sanousun.mdweather.model.SimpleWeather;
-import com.sanousun.mdweather.model.Weather;
-import com.sanousun.mdweather.rxmethod.Event;
+import com.sanousun.mdweather.model.SimpleWeatherBean;
+import com.sanousun.mdweather.model.WeatherBean;
+import com.sanousun.mdweather.rxmethod.ErrorVerify;
 import com.sanousun.mdweather.rxmethod.RxMethod;
-import com.sanousun.mdweather.rxmethod.SimpleWeatherEvent;
-import com.sanousun.mdweather.rxmethod.WeatherEvent;
-import com.sanousun.mdweather.rxmethod.WeatherForLocEvent;
+import com.sanousun.mdweather.rxmethod.SimpleErrorVerify;
 import com.sanousun.mdweather.support.util.DensityUtil;
+import com.sanousun.mdweather.support.util.NetworkUtil;
 import com.sanousun.mdweather.support.util.StringUtil;
 import com.sanousun.mdweather.support.util.WeatherIconUtil;
 import com.sanousun.mdweather.ui.widget.AirQualityIndexView;
@@ -52,7 +51,8 @@ import java.util.Map;
 import butterknife.Bind;
 import de.greenrobot.event.Subscribe;
 
-import static com.sanousun.mdweather.ui.widget.SunRiseToSetView.*;
+import static com.sanousun.mdweather.ui.widget.SunRiseToSetView.Clock;
+import static com.sanousun.mdweather.ui.widget.SunRiseToSetView.VISIBLE;
 
 // TODO: 2016/2/1 后续考虑加入fragmentAdapter
 public class MainActivity extends BaseActivity
@@ -74,6 +74,8 @@ public class MainActivity extends BaseActivity
     private AMapLocationClient mLocationClient;
     private boolean isLocal;
     private boolean isLaunched;
+
+    private ErrorVerify errorVerify;
 
     //用于判断两次返回键的间隔时间
     private long currentTime = 0;
@@ -198,7 +200,6 @@ public class MainActivity extends BaseActivity
         }
     }
 
-
     @Override
     protected void initView() {
         setSupportActionBar(mToolbar);
@@ -212,6 +213,13 @@ public class MainActivity extends BaseActivity
         mIndexViews.put("xc", mXiCheView);
         mIndexViews.put("ls", mLiangShaiView);
         mIndexViews.put("yd", mYunDongView);
+
+        errorVerify = new SimpleErrorVerify(getApplicationContext()) {
+            @Override
+            public void callback() {
+                mRefreshLayout.setRefreshing(false);
+            }
+        };
     }
 
     @Override
@@ -223,7 +231,8 @@ public class MainActivity extends BaseActivity
     @Override
     public void onRefresh() {
         mRefreshLayout.setRefreshing(true);
-        mCompositeSubscription.add(RxMethod.getSimpleWeather(mCityId));
+        mCompositeSubscription.add(
+                RxMethod.getSimpleWeather(mCityId, errorVerify));
     }
 
     @Override
@@ -231,61 +240,29 @@ public class MainActivity extends BaseActivity
         mRefreshLayout.setEnabled(o == 0);
     }
 
-    //----------------------------------------Event Bus ↓-------------------------------------------
+    //----------------------------------------Event Bus-------------------------------------------
     @Subscribe
-    public void onEventMainThread(WeatherForLocEvent event) {
-        if (event.getEventResult() == Event.FAIL) {
-            Toast.makeText(this, "未知网络错误!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        SimpleWeather simpleWeather = event.getSimpleWeather();
-        if (simpleWeather.getErrNum() != 0) {
-            Toast.makeText(this, simpleWeather.getErrMsg(), Toast.LENGTH_SHORT).show();
-            return;
-        }
-        updateHeader(simpleWeather);
-        mCityId = simpleWeather.getRetData().getCitycode();
-        mCompositeSubscription.add(RxMethod.getWeather(mCityId));
+    public void onEventMainThread(SimpleWeatherBean simpleWeatherBean) {
+        updateHeader(simpleWeatherBean);
+        mCityId = simpleWeatherBean.getCitycode();
+        mCompositeSubscription.add(
+                RxMethod.getWeather(mCityId, errorVerify));
     }
 
     @Subscribe
-    public void onEventMainThread(SimpleWeatherEvent event) {
-        if (event.getEventResult() == Event.FAIL) {
-            Toast.makeText(this, "未知网络错误!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        SimpleWeather simpleWeather = event.getSimpleWeather();
-        if (simpleWeather.getErrNum() != 0) {
-            Toast.makeText(this, simpleWeather.getErrMsg(), Toast.LENGTH_SHORT).show();
-            return;
-        }
-        updateHeader(simpleWeather);
-        mCompositeSubscription.add(RxMethod.getWeather(mCityId));
-    }
-
-    @Subscribe
-    public void onEventMainThread(WeatherEvent event) {
-        if (event.getEventResult() == Event.FAIL) {
-            Toast.makeText(this, "未知网络错误!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        Weather weather = event.getWeather();
-        if (weather.getErrNum() != 0) {
-            Toast.makeText(this, weather.getErrMsg(), Toast.LENGTH_SHORT).show();
-            return;
-        }
-        updateContent(weather);
+    public void onEventMainThread(WeatherBean weatherBean) {
+        updateContent(weatherBean);
         mContentContainer.setVisibility(VISIBLE);
         mRefreshLayout.setRefreshing(false);
     }
-    //-------------------------------------------Event Bus ↑----------------------------------------
+    //-------------------------------------------Event Bus----------------------------------------
 
     private void setActionBar() {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle(mCityName);
             if (isLocal)
-                actionBar.setLogo(R.mipmap.ic_action_location);
+                actionBar.setLogo(R.drawable.ic_action_location);
             if (!isLaunched)
                 actionBar.setDisplayHomeAsUpEnabled(true);
         }
@@ -307,38 +284,35 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    private void updateHeader(SimpleWeather s) {
-
-        SimpleWeather.RetDataEntity w = s.getRetData();
-        if (w == null) return;
+    private void updateHeader(SimpleWeatherBean s) {
+        if (s == null) return;
         //得到RunRiseToSetView所需要的数据
         Calendar c = Calendar.getInstance();
         int hour = c.get(Calendar.HOUR_OF_DAY);
         int minute = c.get(Calendar.MINUTE);
         Clock now = new Clock(hour, minute);
-        Clock sunrise = new Clock(w.getRiseH(), w.getRiseM());
-        Clock sunset = new Clock(w.getSetH(), w.getSetM());
+        Clock sunrise = new Clock(s.getRiseH(), s.getRiseM());
+        Clock sunset = new Clock(s.getSetH(), s.getSetM());
         //判断当前时间是否是晚上
-        isNight = w.isNight();
-        mWeatherType = w.getWeather();
+        isNight = s.isNight();
+        mWeatherType = s.getWeather();
         setActionBar();
         setBackground();
-        mTempText.setText(String.format("%s°", w.getTemp()));
-        mWeatherTypeText.setText(w.getWeather());
-        mTempHLText.setText(String.format("%s°/%s°", w.getH_tmp(), w.getL_tmp()));
-        mWindText.setText(String.format("%s %s", w.getWD(), w.getWS()));
+        mTempText.setText(String.format("%s°", s.getTemp()));
+        mWeatherTypeText.setText(s.getWeather());
+        mTempHLText.setText(String.format("%s°/%s°", s.getH_tmp(), s.getL_tmp()));
+        mWindText.setText(String.format("%s %s", s.getWD(), s.getWS()));
 
         mSunR2SView.setNowClock(sunrise, sunset, now);
     }
 
-    private void updateContent(Weather weather) {
-        Weather.RetDataEntity w = weather.getRetData();
+    private void updateContent(WeatherBean w) {
         if (w == null) return;
         //得到SevenDayWeatherView所需要的数据
         WeatherHolder[] whs = new WeatherHolder[7];
         int k = 0;
         while (k < 2) {
-            Weather.RetDataEntity.HistoryEntity historyEntity =
+            WeatherBean.HistoryEntity historyEntity =
                     w.getHistory().get(w.getHistory().size() + k - 2);
             WeatherHolder wh = new WeatherHolder();
             wh.setDay(StringUtil.getDay(historyEntity.getDate()));
@@ -349,7 +323,7 @@ public class MainActivity extends BaseActivity
             wh.setMinTemp(StringUtil.getTemp(historyEntity.getLowtemp()));
             whs[k++] = wh;
         }
-        Weather.RetDataEntity.TodayEntity todayEntity = w.getToday();
+        WeatherBean.TodayEntity todayEntity = w.getToday();
         WeatherHolder holder = new WeatherHolder();
         holder.setDay(StringUtil.getDay(todayEntity.getDate()));
         holder.setWeek("今日");
@@ -359,7 +333,7 @@ public class MainActivity extends BaseActivity
         holder.setMinTemp(StringUtil.getTemp(todayEntity.getLowtemp()));
         whs[k++] = holder;
         while (k < 7) {
-            Weather.RetDataEntity.ForecastEntity forecastEntity =
+            WeatherBean.ForecastEntity forecastEntity =
                     w.getForecast().get(k - 3);
             WeatherHolder wh = new WeatherHolder();
             wh.setDay(StringUtil.getDay(forecastEntity.getDate()));
@@ -375,7 +349,7 @@ public class MainActivity extends BaseActivity
         mAqiView.setAqi(StringUtil.getAqi(todayEntity.getAqi()));
 
         //设置生活指数
-        for (Weather.RetDataEntity.TodayEntity.IndexEntity index : w.getToday().getIndex()) {
+        for (WeatherBean.TodayEntity.IndexEntity index : w.getToday().getIndex()) {
             View v = mIndexViews.get(index.getCode());
             ((ImageView) v.findViewById(R.id.view_index_iv_icon)).
                     setImageResource(WeatherIconUtil.getIndexResId(this, index.getCode()));
@@ -425,18 +399,25 @@ public class MainActivity extends BaseActivity
             if (aMapLocation.getErrorCode() == 0) {
                 String city = aMapLocation.getCity();
                 mCityName = city.substring(0, city.length() - 1);
-                mCompositeSubscription.add(RxMethod.getWeatherForLoc(mCityName));
+                mCompositeSubscription.add(
+                        RxMethod.getWeatherForLoc(mCityName, errorVerify));
             } else {
                 //显示错误信息
-                Toast.makeText(getApplicationContext(),
-                        aMapLocation.getErrorInfo(), Toast.LENGTH_SHORT).show();
+                if (NetworkUtil.isNetworkConnected(getApplicationContext())) {
+                    Toast.makeText(getApplicationContext(),
+                            aMapLocation.getErrorInfo(), Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(),
+                            "网络未连接", Toast.LENGTH_SHORT).show();
+                }
+                mRefreshLayout.setRefreshing(false);
             }
         }
     }
 
     @Override
     public void onBackPressed() {
-        if(!isLaunched){
+        if (!isLaunched) {
             super.onBackPressed();
         }
         if ((System.currentTimeMillis() - currentTime) < 2000) {

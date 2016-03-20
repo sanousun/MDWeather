@@ -10,7 +10,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.sanousun.mdweather.R;
-import com.sanousun.mdweather.model.SimpleWeather;
+import com.sanousun.mdweather.model.SimpleWeatherBean;
 import com.sanousun.mdweather.support.util.WeatherIconUtil;
 
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public class CityListAdapter
         implements ItemSwipeHelperCallBack.ItemSwipeHelperAdapter {
 
     private Context mContext;
-    private List<SimpleWeather> mWeatherList = new ArrayList<>();
+    private List<SimpleWeatherBean> mWeatherList = new ArrayList<>();
     private OnItemClickListener mListener;
 
     public CityListAdapter(Context context) {
@@ -35,7 +35,7 @@ public class CityListAdapter
         this.mListener = listener;
     }
 
-    public void add(SimpleWeather data) {
+    public void add(SimpleWeatherBean data) {
         mWeatherList.add(data);
         notifyItemInserted(mWeatherList.size());
     }
@@ -88,7 +88,7 @@ public class CityListAdapter
         @Bind(R.id.city_item_tv_type)
         TextView mWeatherType;
 
-        SimpleWeather mWeather;
+        SimpleWeatherBean mWeather;
 
         public MyViewHolder(View itemView) {
             super(itemView);
@@ -102,15 +102,15 @@ public class CityListAdapter
             //根据天气，设置背景图片
             int resId = WeatherIconUtil.
                     getBackgroundResId(mContext,
-                            mWeather.getRetData().getWeather(),
-                            mWeather.getRetData().isNight());
+                            mWeather.getWeather(),
+                            mWeather.isNight());
             mContainer.setBackgroundResource(resId);
             //判断是否属于本地天气，是则将定位icon显示
             mLocationIcon.setVisibility(
                     pos == 0 ? View.VISIBLE : View.GONE);
-            mCityName.setText(mWeather.getRetData().getCity());
-            mWeatherTemp.setText(String.format("%s°", mWeather.getRetData().getTemp()));
-            mWeatherType.setText(mWeather.getRetData().getWeather());
+            mCityName.setText(mWeather.getCity());
+            mWeatherTemp.setText(String.format("%s°", mWeather.getTemp()));
+            mWeatherType.setText(mWeather.getWeather());
         }
 
         @Override

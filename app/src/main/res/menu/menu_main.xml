@@ -5,7 +5,7 @@
 
     <item
         android:id="@+id/action_city_list"
-        android:icon="@mipmap/ic_action_city"
+        android:icon="@drawable/ic_action_city"
         android:title="@string/city_list"
         app:showAsAction="ifRoom|collapseActionView"/>
 

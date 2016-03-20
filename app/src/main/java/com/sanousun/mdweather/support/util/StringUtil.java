@@ -11,9 +11,7 @@ public class StringUtil {
         for (int i = 5; i < 10; i++) {
             if (i == 7) {
                 s.append('/');
-            } else if (d.charAt(i) == '0') {
-                continue;
-            } else {
+            } else if (d.charAt(i) != '0') {
                 s.append(d.charAt(i));
             }
         }
