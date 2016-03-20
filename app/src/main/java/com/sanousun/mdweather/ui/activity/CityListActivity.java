@@ -19,12 +19,12 @@ import android.widget.Toast;
 import com.amap.api.location.AMapLocationClient;
 import com.sanousun.mdweather.R;
 import com.sanousun.mdweather.app.MyApplication;
-import com.sanousun.mdweather.model.CityList;
-import com.sanousun.mdweather.model.SimpleWeather;
-import com.sanousun.mdweather.rxmethod.CityListEvent;
-import com.sanousun.mdweather.rxmethod.Event;
+import com.sanousun.mdweather.model.CityBean;
+import com.sanousun.mdweather.model.CityWeatherBean;
+import com.sanousun.mdweather.model.SimpleWeatherBean;
+import com.sanousun.mdweather.rxmethod.ErrorVerify;
 import com.sanousun.mdweather.rxmethod.RxMethod;
-import com.sanousun.mdweather.rxmethod.WeatherForListEvent;
+import com.sanousun.mdweather.rxmethod.SimpleErrorVerify;
 import com.sanousun.mdweather.support.util.DensityUtil;
 import com.sanousun.mdweather.ui.adapter.CityListAdapter;
 import com.sanousun.mdweather.ui.adapter.ItemSwipeHelperCallBack;
@@ -49,12 +49,12 @@ public class CityListActivity extends BaseActivity
     RecyclerView mRecyclerView;
 
     private List<String> mCityIdList;
-    private List<SimpleWeather> mWeatherList;
+    private List<SimpleWeatherBean> mWeatherList;
     private CityListAdapter mAdapter;
     private SearchView mSearchView;
     private MenuItem mSearchItem;
 
-
+    private ErrorVerify errorVerify;
 
     private AMapLocationClient mLocationClient = null;
 
@@ -103,6 +103,13 @@ public class CityListActivity extends BaseActivity
         }
         mCityIdList.addAll(MyApplication.getDataSource().getCityIdList());
         mWeatherList = new ArrayList<>();
+
+        errorVerify = new SimpleErrorVerify(getApplicationContext()) {
+            @Override
+            public void callback() {
+                mRefreshLayout.setRefreshing(false);
+            }
+        };
     }
 
     @Override
@@ -119,66 +126,44 @@ public class CityListActivity extends BaseActivity
         }
     }
 
-    //-----------------------------------------------------------------------------
     //-------------------SwipeRefreshLayout.OnRefreshListener----------------------
-    //-----------------------------------------------------------------------------
     @Override
     public void onRefresh() {
         mRefreshLayout.setRefreshing(true);
         mWeatherList = new ArrayList<>();
         mAdapter.removeAll();
-        mCompositeSubscription.add(
-                RxMethod.getWeatherForList(
-                        mCityIdList.get(mWeatherList.size())));
+        mCompositeSubscription.add(RxMethod.getWeatherForList(
+                mCityIdList.get(mWeatherList.size()), errorVerify));
     }
-    //-----------------------------------------------------------------------------
     //--------------------SwipeRefreshLayout.OnRefreshListener---------------------
-    //-----------------------------------------------------------------------------
 
-    //-----------------------------------------------------------------------------
     //---------------------------------Event Bus-----------------------------------
-    //-----------------------------------------------------------------------------
     @Subscribe
-    public void onEventMainThread(WeatherForListEvent event) {
-        if (event.getEventResult() == Event.FAIL) {
-            Toast.makeText(this, "未知网络错误!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        SimpleWeather simpleWeather = event.getSimpleWeather();
-        if (simpleWeather.getErrNum() != 0) {
-            Toast.makeText(this, simpleWeather.getErrMsg(), Toast.LENGTH_SHORT).show();
-            return;
-        }
-        mWeatherList.add(simpleWeather);
-        mAdapter.add(simpleWeather);
+    public void onEventMainThread(CityWeatherBean weather) {
+        mWeatherList.add(weather);
+        mAdapter.add(weather);
         if (getNextCity() == null) {
             mRefreshLayout.setRefreshing(false);
         } else {
-            mCompositeSubscription.add(RxMethod.getWeatherForList(getNextCity()));
+            mCompositeSubscription.add(RxMethod.getWeatherForList(getNextCity(), errorVerify));
         }
     }
 
     @Subscribe
-    public void onEventMainThread(CityListEvent event) {
-        if (event.getEventResult() == Event.FAIL) {
-            Toast.makeText(this, "未知网络错误!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        CityList cityList = event.getCityList();
-        if (cityList.getErrNum() != 0) {
-            Toast.makeText(this, cityList.getErrMsg(), Toast.LENGTH_SHORT).show();
-            return;
-        }
+    public void onEventMainThread(List<CityBean> cityList) {
         mSearchView.setIconified(false);
         mSearchView.clearFocus();
         MenuItemCompat.collapseActionView(mSearchItem);
-
-        String cityName = cityList.getRetData().get(0).getName_cn();
-        String cityId = cityList.getRetData().get(0).getArea_id();
+        if (cityList.size() == 0) {
+            Toast.makeText(this, "查询不到该城市", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String cityName = cityList.get(0).getName_cn();
+        String cityId = cityList.get(0).getArea_id();
         if (cityId == null) return;
         MyApplication.getDataSource().insert(cityName, cityId);
         mCityIdList.add(cityId);
-        mCompositeSubscription.add(RxMethod.getWeatherForList(cityId));
+        mCompositeSubscription.add(RxMethod.getWeatherForList(cityId, errorVerify));
     }
 
     /**
@@ -192,21 +177,15 @@ public class CityListActivity extends BaseActivity
             return getNextCity();
         return mCityIdList.get(pos);
     }
-
-    //-----------------------------------------------------------------------------
     //---------------------------------Event Bus-----------------------------------
-    //-----------------------------------------------------------------------------
 
-    //-----------------------------------------------------------------------------
     //-------------------CityListAdapter.OnItemClickListener-----------------------
-    //-----------------------------------------------------------------------------
-
     @Override
     public void itemClick(int pos) {
-        SimpleWeather.RetDataEntity entity = mWeatherList.get(pos).getRetData();
+        SimpleWeatherBean simpleWeather = mWeatherList.get(pos);
         MainActivity.startActivity(this, pos == 0,
-                entity.getCitycode(), entity.getCity(),
-                entity.getWeather(), entity.isNight());
+                simpleWeather.getCitycode(), simpleWeather.getCity(),
+                simpleWeather.getWeather(), simpleWeather.isNight());
     }
 
     @Override
@@ -215,10 +194,7 @@ public class CityListActivity extends BaseActivity
         MyApplication.getDataSource().delete(cityId);
         mWeatherList.remove(pos);
     }
-
-    //-----------------------------------------------------------------------------
     //-------------------CityListAdapter.OnItemClickListener-----------------------
-    //-----------------------------------------------------------------------------
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -235,7 +211,7 @@ public class CityListActivity extends BaseActivity
                                 "城市已存在列表中", Toast.LENGTH_SHORT).show();
                         mSearchView.setQuery(null, false);
                     } else {
-                        mCompositeSubscription.add(RxMethod.getCityList(query));
+                        mCompositeSubscription.add(RxMethod.getCityList(query, errorVerify));
                         mRefreshLayout.setRefreshing(true);
                     }
                     return true;
