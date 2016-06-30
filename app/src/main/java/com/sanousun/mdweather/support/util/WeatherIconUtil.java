@@ -8,14 +8,17 @@ import java.util.Map;
 
 public class WeatherIconUtil {
 
-    static Map<String, String> sWeatherIcon = new HashMap<>();
-    static Map<String, String> sWeatherBackground = new HashMap<>();
 
-    static final String[] WEATHER_TYPE = {
+    private static final String def_package = "com.sanousun.mdweather";
+
+    private static Map<String, String> sWeatherIcon = new HashMap<>();
+    private static Map<String, String> sWeatherBackground = new HashMap<>();
+
+    private static final String[] WEATHER_TYPE = {
             "晴", "多云", "阴", "雷阵雨", "雷阵雨伴有冰雹", "冻雨", "阵雨", "小雨", "中雨",
             "大雨", "暴雨", "大暴雨", "特大暴雨", "雨夹雪", "阵雪", "小雪", "中雪", "大雪",
             "暴雪", "雾", "沙尘暴", "强沙尘暴", "浮尘", "扬沙", "霾"};
-    static final String[] WEATHER_TYPE_EN = {
+    private static final String[] WEATHER_TYPE_EN = {
             "weather_fine", "weather_cloudy", "weather_overcast", "weather_thundershower",
             "weather_thundershower_with_hail", "weather_freezing_rain", "weather_shower",
             "weather_light_rain", "weather_moderate_rain", "weather_heavy_rain",
@@ -24,7 +27,7 @@ public class WeatherIconUtil {
             "weather_moderate_snow", "weather_heavy_snow", "weather_snowstorm",
             "weather_fog", "weather_sandstorm", "weather_strong_sandstorm",
             "weather_floating_dust", "weather_blowing_sand", "weather_haze"};
-    static final String[] WEATHER_BG = {
+    private static final String[] WEATHER_BG = {
             "weather_fine", "weather_cloudy", "weather_overcast", "weather_thundershower",
             "weather_thundershower", "weather_rain", "weather_shower",
             "weather_rain", "weather_rain", "weather_rain",
@@ -48,8 +51,7 @@ public class WeatherIconUtil {
     public static int getIconResId(Context context, String type) {
         Resources resources = context.getResources();
         if (sWeatherIcon.get(type) != null) {
-            return resources.getIdentifier(
-                    sWeatherIcon.get(type), "drawable", "com.sanousun.mdweather");
+            return resources.getIdentifier(sWeatherIcon.get(type), "drawable", def_package);
         }
         return -1;
     }
@@ -58,13 +60,9 @@ public class WeatherIconUtil {
         Resources resources = context.getResources();
         if (sWeatherBackground.get(type) != null) {
             if (isNight) {
-                return resources.getIdentifier(
-                        "bg_" + sWeatherBackground.get(type) + "_night",
-                        "drawable", "com.sanousun.mdweather");
+                return resources.getIdentifier("bg_" + sWeatherBackground.get(type) + "_n", "drawable", def_package);
             } else {
-                return resources.getIdentifier(
-                        "bg_" + sWeatherBackground.get(type),
-                        "drawable", "com.sanousun.mdweather");
+                return resources.getIdentifier("bg_" + sWeatherBackground.get(type), "drawable", def_package);
             }
         }
         return -1;
@@ -74,13 +72,9 @@ public class WeatherIconUtil {
         Resources resources = context.getResources();
         if (sWeatherBackground.get(type) != null) {
             if (isNight) {
-                return resources.getIdentifier(
-                        sWeatherBackground.get(type) + "_night",
-                        "color", "com.sanousun.mdweather");
+                return resources.getIdentifier(sWeatherBackground.get(type) + "_n", "color", def_package);
             } else {
-                return resources.getIdentifier(
-                        sWeatherBackground.get(type), "color",
-                        "com.sanousun.mdweather");
+                return resources.getIdentifier(sWeatherBackground.get(type), "color", def_package);
             }
         }
         return -1;
@@ -89,7 +83,6 @@ public class WeatherIconUtil {
     public static int getIndexResId(Context context, String index) {
         Resources resources = context.getResources();
         String s = "index_" + index;
-        return resources.getIdentifier(
-                s, "drawable", "com.sanousun.mdweather");
+        return resources.getIdentifier(s, "drawable", def_package);
     }
 }

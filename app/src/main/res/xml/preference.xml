@@ -3,6 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
+        android:title="@string/version">
+        <Preference
+            android:summary="天气2.0"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:title="@string/introduce">
         <Preference
             android:summary="@string/summary"/>
@@ -10,8 +16,7 @@
 
     <PreferenceCategory
         android:title="@string/author">
-        <Preference
-            android:summary="@string/author_introduce"/>
+
         <Preference
             android:key="email"
             android:summary="@string/emai_summary"

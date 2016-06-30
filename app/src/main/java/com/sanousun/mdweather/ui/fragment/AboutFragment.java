@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -40,22 +39,16 @@ public class AboutFragment extends PreferenceFragment
                         build().showAppCompat();
                 break;
             default:
-                new AlertDialog.Builder(getActivity()).
-                        setMessage("复制到剪贴板？").
-                        setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                ClipData myClip;
-                                CharSequence text = preference.getSummary();
-                                myClip = ClipData.newPlainText("text", text);
-                                cm.setPrimaryClip(myClip);
-                            }
-                        }).
-                        setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.cancel();
-                            }
+                new AlertDialog.Builder(getActivity())
+                        .setMessage("复制到剪贴板？")
+                        .setPositiveButton("确定", (dialogInterface, i) -> {
+                            ClipData myClip;
+                            CharSequence text = preference.getSummary();
+                            myClip = ClipData.newPlainText("text", text);
+                            cm.setPrimaryClip(myClip);
+                        })
+                        .setNegativeButton("取消", (dialogInterface, i) -> {
+                            dialogInterface.cancel();
                         }).show();
                 break;
         }

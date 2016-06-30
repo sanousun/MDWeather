@@ -2,7 +2,6 @@ package com.sanousun.mdweather.app;
 
 import com.sanousun.mdweather.model.BaseResponse;
 import com.sanousun.mdweather.model.CityBean;
-import com.sanousun.mdweather.model.CityWeatherBean;
 import com.sanousun.mdweather.model.SimpleWeatherBean;
 import com.sanousun.mdweather.model.WeatherBean;
 
@@ -22,9 +21,6 @@ public interface WeatherApi {
 
     @GET("cityid")
     Observable<BaseResponse<SimpleWeatherBean>> getSimpleWeather(@Query("cityid") String cityId);
-
-    @GET("cityid")
-    Observable<BaseResponse<CityWeatherBean>> getSimpleWeatherForList(@Query("cityid") String cityId);
 
     @GET("cityname")
     Observable<BaseResponse<SimpleWeatherBean>> getSimpleWeatherForLoc(@Query("cityname") String cityName);

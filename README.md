@@ -1,8 +1,6 @@
 MDWeather
 ========
 ## 前言
-这是我自学Android以后开发的第二个app
-,是一个开发周期较短的应用。
 灵感来源于materialup上的一些天气应用设计，
 刚好那时候想着试试retrofit+rxjava的组合，
 也就开始准着手这个应用的开发。
@@ -13,18 +11,16 @@ MDWeather
 七天天气预报，空气质量。
 ##计划
 最近一次上传添加了本地天气的获取，
-采用了高德地图的sdk。<br/>
-2016/2/29 将主启动界面更换成了本地天气界面<br/>
-2016/3/1 应用初步完成<br/>
-design support 23.2兼容animated vector drawables, 可以考虑将背景图转化为动态图
+1. 采用了高德地图的sdk。<br/>
+2. 将主启动界面更换成了本地天气界面<br/>
+3. 应用初步完成<br/>
+4. 去除eventBus,如果需要可以使用rxBus<br/>
+5. 界面更改<br/>
 ## 数据来源
 [天气查询](http://apistore.baidu.com/apiworks/servicedetail/112.html "百度的api store")  百度的api store中的一个关于天气的api
 ## 截图
 ![](https://github.com/sanousun/MDWeather/blob/master/screenshot/screenshot.jpg)
-### 另一个app的地址
-这是我自学Android三个月时就开始准备的第一个开发的
-应用，虽然有着诸多的不足，功能也略显简单。但也充分地
-作用到了所学所想，也比较严格地遵守了material design的规范。
-[豆瓣电影](https://github.com/sanousun/DoubanFilm)
+### 使用方法
+[高德开放平台](http://lbs.amap.com/)申请key填入manifests中
 ### 这是我的邮箱，欢迎联系交流
 sanousun@163.com

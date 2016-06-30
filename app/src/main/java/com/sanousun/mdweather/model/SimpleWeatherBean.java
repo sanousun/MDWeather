@@ -1,162 +1,82 @@
 package com.sanousun.mdweather.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import java.util.Calendar;
 
-public class SimpleWeatherBean {
+public class SimpleWeatherBean implements Parcelable {
 
-    private String city;
-    private String pinyin;
-    private String citycode;
-    private String date;
-    private String time;
-    private String postCode;
-    private double longitude;
-    private double latitude;
-    private String altitude;
-    private String weather;
-    private String temp;
-    private String l_tmp;
-    private String h_tmp;
-    private String WD;
-    private String WS;
-    private String sunrise;
-    private String sunset;
+    @SerializedName("city")
+    @Expose
+    public String city;
 
-    public void setCity(String city) {
-        this.city = city;
-    }
+    @SerializedName("pinyin")
+    @Expose
+    public String pinyin;
 
-    public void setPinyin(String pinyin) {
-        this.pinyin = pinyin;
-    }
+    @SerializedName("citycode")
+    @Expose
+    public String citycode;
 
-    public void setCitycode(String citycode) {
-        this.citycode = citycode;
-    }
+    @SerializedName("date")
+    @Expose
+    public String date;
 
-    public void setDate(String date) {
-        this.date = date;
-    }
+    @SerializedName("time")
+    @Expose
+    public String time;
 
-    public void setTime(String time) {
-        this.time = time;
-    }
+    @SerializedName("postCode")
+    @Expose
+    public String postCode;
 
-    public void setPostCode(String postCode) {
-        this.postCode = postCode;
-    }
+    @SerializedName("longitude")
+    @Expose
+    public Double longitude;
 
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
+    @SerializedName("latitude")
+    @Expose
+    public Double latitude;
 
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
+    @SerializedName("altitude")
+    @Expose
+    public String altitude;
 
-    public void setAltitude(String altitude) {
-        this.altitude = altitude;
-    }
+    @SerializedName("weather")
+    @Expose
+    public String weather;
 
-    public void setWeather(String weather) {
-        this.weather = weather;
-    }
+    @SerializedName("temp")
+    @Expose
+    public String temp;
 
-    public void setTemp(String temp) {
-        this.temp = temp;
-    }
+    @SerializedName("l_tmp")
+    @Expose
+    public String l_tmp;
 
-    public void setL_tmp(String l_tmp) {
-        this.l_tmp = l_tmp;
-    }
+    @SerializedName("h_tmp")
+    @Expose
+    public String h_tmp;
 
-    public void setH_tmp(String h_tmp) {
-        this.h_tmp = h_tmp;
-    }
+    @SerializedName("WD")
+    @Expose
+    public String WD;
 
-    public void setWD(String WD) {
-        this.WD = WD;
-    }
+    @SerializedName("WS")
+    @Expose
+    public String WS;
 
-    public void setWS(String WS) {
-        this.WS = WS;
-    }
+    @SerializedName("sunrise")
+    @Expose
+    public String sunrise;
 
-    public void setSunrise(String sunrise) {
-        this.sunrise = sunrise;
-    }
-
-    public void setSunset(String sunset) {
-        this.sunset = sunset;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public String getPinyin() {
-        return pinyin;
-    }
-
-    public String getCitycode() {
-        return citycode;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public String getPostCode() {
-        return postCode;
-    }
-
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public String getAltitude() {
-        return altitude;
-    }
-
-    public String getWeather() {
-        return weather;
-    }
-
-    public String getTemp() {
-        return temp;
-    }
-
-    public String getL_tmp() {
-        return l_tmp;
-    }
-
-    public String getH_tmp() {
-        return h_tmp;
-    }
-
-    public String getWD() {
-        return WD;
-    }
-
-    public String getWS() {
-        return WS;
-    }
-
-    public String getSunrise() {
-        return sunrise;
-    }
-
-    public String getSunset() {
-        return sunset;
-    }
+    @SerializedName("sunset")
+    @Expose
+    public String sunset;
 
     public int getRiseH() {
         return (sunrise.charAt(0) - '0') * 10 + sunrise.charAt(1) - '0';
@@ -188,5 +108,66 @@ public class SimpleWeatherBean {
         }
         return false;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.city);
+        dest.writeString(this.pinyin);
+        dest.writeString(this.citycode);
+        dest.writeString(this.date);
+        dest.writeString(this.time);
+        dest.writeString(this.postCode);
+        dest.writeDouble(this.longitude);
+        dest.writeDouble(this.latitude);
+        dest.writeString(this.altitude);
+        dest.writeString(this.weather);
+        dest.writeString(this.temp);
+        dest.writeString(this.l_tmp);
+        dest.writeString(this.h_tmp);
+        dest.writeString(this.WD);
+        dest.writeString(this.WS);
+        dest.writeString(this.sunrise);
+        dest.writeString(this.sunset);
+    }
+
+    public SimpleWeatherBean() {
+    }
+
+    protected SimpleWeatherBean(Parcel in) {
+        this.city = in.readString();
+        this.pinyin = in.readString();
+        this.citycode = in.readString();
+        this.date = in.readString();
+        this.time = in.readString();
+        this.postCode = in.readString();
+        this.longitude = in.readDouble();
+        this.latitude = in.readDouble();
+        this.altitude = in.readString();
+        this.weather = in.readString();
+        this.temp = in.readString();
+        this.l_tmp = in.readString();
+        this.h_tmp = in.readString();
+        this.WD = in.readString();
+        this.WS = in.readString();
+        this.sunrise = in.readString();
+        this.sunset = in.readString();
+    }
+
+    public static final Parcelable.Creator<SimpleWeatherBean> CREATOR = new Parcelable.Creator<SimpleWeatherBean>() {
+        @Override
+        public SimpleWeatherBean createFromParcel(Parcel source) {
+            return new SimpleWeatherBean(source);
+        }
+
+        @Override
+        public SimpleWeatherBean[] newArray(int size) {
+            return new SimpleWeatherBean[size];
+        }
+    };
 }
 

@@ -6,24 +6,23 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.amap.api.location.AMapLocationClient;
 import com.sanousun.mdweather.R;
 import com.sanousun.mdweather.app.MyApplication;
+import com.sanousun.mdweather.app.WeatherApiUtil;
 import com.sanousun.mdweather.model.CityBean;
-import com.sanousun.mdweather.model.CityWeatherBean;
 import com.sanousun.mdweather.model.SimpleWeatherBean;
-import com.sanousun.mdweather.rxmethod.ErrorVerify;
-import com.sanousun.mdweather.rxmethod.RxMethod;
 import com.sanousun.mdweather.rxmethod.SimpleErrorVerify;
 import com.sanousun.mdweather.support.util.DensityUtil;
 import com.sanousun.mdweather.ui.adapter.CityListAdapter;
@@ -33,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
-import de.greenrobot.event.Subscribe;
+import rx.Subscription;
 
 public class CityListActivity extends BaseActivity
         implements CityListAdapter.OnItemClickListener,
@@ -52,16 +51,6 @@ public class CityListActivity extends BaseActivity
     private List<SimpleWeatherBean> mWeatherList;
     private CityListAdapter mAdapter;
     private SearchView mSearchView;
-    private MenuItem mSearchItem;
-
-    private ErrorVerify errorVerify;
-
-    private AMapLocationClient mLocationClient = null;
-
-    public static void toActivity(Context context) {
-        Intent intent = new Intent(context, CityListActivity.class);
-        context.startActivity(intent);
-    }
 
     public static void toActivity(Context context, String localCity) {
         Intent intent = new Intent(context, CityListActivity.class);
@@ -99,17 +88,13 @@ public class CityListActivity extends BaseActivity
     protected void initData() {
         mCityIdList = new ArrayList<>();
         if (getIntent() != null) {
-            mCityIdList.add(getIntent().getStringExtra(LOCAL_CITY));
+            String id = getIntent().getStringExtra(LOCAL_CITY);
+            if (!TextUtils.isEmpty(id)) {
+                mCityIdList.add(id);
+            }
         }
         mCityIdList.addAll(MyApplication.getDataSource().getCityIdList());
         mWeatherList = new ArrayList<>();
-
-        errorVerify = new SimpleErrorVerify(getApplicationContext()) {
-            @Override
-            public void callback() {
-                mRefreshLayout.setRefreshing(false);
-            }
-        };
     }
 
     @Override
@@ -119,73 +104,49 @@ public class CityListActivity extends BaseActivity
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mLocationClient != null) {
-            mLocationClient.onDestroy();
-        }
-    }
-
-    //-------------------SwipeRefreshLayout.OnRefreshListener----------------------
-    @Override
     public void onRefresh() {
         mRefreshLayout.setRefreshing(true);
-        mWeatherList = new ArrayList<>();
+        mWeatherList.clear();
         mAdapter.removeAll();
-        mCompositeSubscription.add(RxMethod.getWeatherForList(
-                mCityIdList.get(mWeatherList.size()), errorVerify));
+        loadData();
     }
-    //--------------------SwipeRefreshLayout.OnRefreshListener---------------------
 
-    //---------------------------------Event Bus-----------------------------------
-    @Subscribe
-    public void onEventMainThread(CityWeatherBean weather) {
-        mWeatherList.add(weather);
-        mAdapter.add(weather);
-        if (getNextCity() == null) {
+    private void loadData() {
+        String id = getNextCity();
+        if (TextUtils.isEmpty(id)) {
             mRefreshLayout.setRefreshing(false);
         } else {
-            mCompositeSubscription.add(RxMethod.getWeatherForList(getNextCity(), errorVerify));
+            mRefreshLayout.setRefreshing(true);
+            Subscription subscription = WeatherApiUtil.getWeatherApi()
+                    .getSimpleWeather(id)
+                    .compose(WeatherApiUtil.composeFilter(new SimpleErrorVerify(this, mRefreshLayout)))
+                    .subscribe(simpleWeatherBean -> {
+                        mWeatherList.add(simpleWeatherBean);
+                        mAdapter.add(simpleWeatherBean);
+                        loadData();
+                    });
+            mCompositeSubscription.add(subscription);
         }
-    }
-
-    @Subscribe
-    public void onEventMainThread(List<CityBean> cityList) {
-        mSearchView.setIconified(false);
-        mSearchView.clearFocus();
-        MenuItemCompat.collapseActionView(mSearchItem);
-        if (cityList.size() == 0) {
-            Toast.makeText(this, "查询不到该城市", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        String cityName = cityList.get(0).getName_cn();
-        String cityId = cityList.get(0).getArea_id();
-        if (cityId == null) return;
-        MyApplication.getDataSource().insert(cityName, cityId);
-        mCityIdList.add(cityId);
-        mCompositeSubscription.add(RxMethod.getWeatherForList(cityId, errorVerify));
     }
 
     /**
      * 获取下一个city的id,localCityId(mCityIdList.get(0))比较，跳过已经作为自动定位出现的城市
      */
     private String getNextCity() {
-        if (mWeatherList.size() >= mCityIdList.size())
-            return null;
         int pos = mWeatherList.size();
-        if (mCityIdList.get(pos).equals(mCityIdList.get(0)))
+        if (pos >= mCityIdList.size())
+            return null;
+        if (pos != 0 && (mCityIdList.get(0)).equals(mCityIdList.get(pos))) {
+            mCityIdList.remove(pos);
             return getNextCity();
+        }
         return mCityIdList.get(pos);
     }
-    //---------------------------------Event Bus-----------------------------------
 
-    //-------------------CityListAdapter.OnItemClickListener-----------------------
     @Override
     public void itemClick(int pos) {
         SimpleWeatherBean simpleWeather = mWeatherList.get(pos);
-        MainActivity.startActivity(this, pos == 0,
-                simpleWeather.getCitycode(), simpleWeather.getCity(),
-                simpleWeather.getWeather(), simpleWeather.isNight());
+        MainActivity.startActivity(this, pos == 0, simpleWeather);
     }
 
     @Override
@@ -194,36 +155,67 @@ public class CityListActivity extends BaseActivity
         MyApplication.getDataSource().delete(cityId);
         mWeatherList.remove(pos);
     }
-    //-------------------CityListAdapter.OnItemClickListener-----------------------
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_citylist, menu);
-        mSearchItem = menu.findItem(R.id.action_search);
-        mSearchView = (SearchView) MenuItemCompat.getActionView(mSearchItem);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        mSearchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         mSearchView.setQueryHint("请输入所要查找的城市...");
-        if (mSearchView != null) {
-            mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    if (MyApplication.getDataSource().getCityId(query) != null) {
-                        Toast.makeText(getApplicationContext(),
-                                "城市已存在列表中", Toast.LENGTH_SHORT).show();
-                        mSearchView.setQuery(null, false);
-                    } else {
-                        mCompositeSubscription.add(RxMethod.getCityList(query, errorVerify));
-                        mRefreshLayout.setRefreshing(true);
-                    }
-                    return true;
-                }
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchCity(query);
+                return true;
+            }
 
-                @Override
-                public boolean onQueryTextChange(String newText) {
-                    return false;
-                }
-            });
-        }
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
         return super.onCreateOptionsMenu(menu);
+    }
+
+    private void searchCity(String query) {
+        if (MyApplication.getDataSource().getCityId(query) != null) {
+            Toast.makeText(CityListActivity.this, "城市已存在列表中", Toast.LENGTH_SHORT).show();
+            mSearchView.setQuery(null, false);
+        } else {
+            Subscription subscription = WeatherApiUtil.getWeatherApi()
+                    .getCityList(query)
+                    .compose(WeatherApiUtil.composeFilter(
+                            new SimpleErrorVerify(CityListActivity.this, mRefreshLayout)))
+                    .subscribe(list -> {
+                        if (list == null || list.size() == 0) {
+                            Toast.makeText(CityListActivity.this, "未查找到城市", Toast.LENGTH_SHORT).show();
+                        } else {
+                            String[] items = new String[list.size()];
+                            for (int i = 0; i < list.size(); i++) {
+                                CityBean city = list.get(i);
+                                items[i] = city.province_cn + "-" + city.name_cn;
+                            }
+                            AlertDialog dialog = new AlertDialog.Builder(CityListActivity.this)
+                                    .setTitle("请选择所在城市：")
+                                    .setItems(items, (dialog1, which) -> {
+                                        CityBean cityBean = list.get(which);
+                                        if (MyApplication.getDataSource().getCityId(cityBean.area_id) != null) {
+                                            Toast.makeText(getApplicationContext(), "城市已存在列表中", Toast.LENGTH_SHORT).show();
+                                            mSearchView.setQuery(null, false);
+                                        } else {
+                                            MyApplication.getDataSource().insert(cityBean.name_cn, cityBean.area_id);
+                                            mCityIdList.add(cityBean.area_id);
+                                            mSearchView.setQuery(null, false);
+                                            loadData();
+                                        }
+                                    })
+                                    .create();
+                            dialog.show();
+                        }
+                    });
+            mCompositeSubscription.add(subscription);
+            mRefreshLayout.setRefreshing(true);
+        }
     }
 
     @Override
@@ -236,5 +228,8 @@ public class CityListActivity extends BaseActivity
         return super.onOptionsItemSelected(item);
     }
 
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 }

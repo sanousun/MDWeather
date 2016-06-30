@@ -11,13 +11,14 @@ import android.widget.TextView;
 
 import com.sanousun.mdweather.R;
 import com.sanousun.mdweather.model.SimpleWeatherBean;
-import com.sanousun.mdweather.support.util.WeatherIconUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+
+import static com.sanousun.mdweather.support.util.WeatherIconUtil.getBackgroundResId;
 
 public class CityListAdapter
         extends RecyclerView.Adapter<CityListAdapter.MyViewHolder>
@@ -53,8 +54,7 @@ public class CityListAdapter
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(mContext).
-                inflate(R.layout.view_city_item, parent, false);
+        View v = LayoutInflater.from(mContext).inflate(R.layout.view_city_item, parent, false);
         return new MyViewHolder(v);
     }
 
@@ -90,27 +90,23 @@ public class CityListAdapter
 
         SimpleWeatherBean mWeather;
 
-        public MyViewHolder(View itemView) {
+        MyViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
         }
 
-        public void update() {
+        void update() {
             int pos = getLayoutPosition();
             mWeather = mWeatherList.get(pos);
             //根据天气，设置背景图片
-            int resId = WeatherIconUtil.
-                    getBackgroundResId(mContext,
-                            mWeather.getWeather(),
-                            mWeather.isNight());
-            mContainer.setBackgroundResource(resId);
+            mContainer.setBackgroundResource(
+                    getBackgroundResId(mContext, mWeather.weather, mWeather.isNight()));
             //判断是否属于本地天气，是则将定位icon显示
-            mLocationIcon.setVisibility(
-                    pos == 0 ? View.VISIBLE : View.GONE);
-            mCityName.setText(mWeather.getCity());
-            mWeatherTemp.setText(String.format("%s°", mWeather.getTemp()));
-            mWeatherType.setText(mWeather.getWeather());
+            mLocationIcon.setVisibility(pos == 0 ? View.VISIBLE : View.GONE);
+            mCityName.setText(mWeather.city);
+            mWeatherTemp.setText(String.format("%s°", mWeather.temp));
+            mWeatherType.setText(mWeather.weather);
         }
 
         @Override

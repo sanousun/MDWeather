@@ -1,338 +1,161 @@
 package com.sanousun.mdweather.model;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 public class WeatherBean {
 
-    private String city;
-    private String cityid;
+    @SerializedName("city")
+    @Expose
+    public String city;
 
-    private TodayEntity today;
+    @SerializedName("cityid")
+    @Expose
+    public String cityid;
 
-    private List<ForecastEntity> forecast;
+    @SerializedName("today")
+    @Expose
+    public TodayEntity today;
 
-    private List<HistoryEntity> history;
+    @SerializedName("forecast")
+    @Expose
+    public List<ForecastEntity> forecast;
 
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public void setCityid(String cityid) {
-        this.cityid = cityid;
-    }
-
-    public void setToday(TodayEntity today) {
-        this.today = today;
-    }
-
-    public void setForecast(List<ForecastEntity> forecast) {
-        this.forecast = forecast;
-    }
-
-    public void setHistory(List<HistoryEntity> history) {
-        this.history = history;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public String getCityid() {
-        return cityid;
-    }
-
-    public TodayEntity getToday() {
-        return today;
-    }
-
-    public List<ForecastEntity> getForecast() {
-        return forecast;
-    }
-
-    public List<HistoryEntity> getHistory() {
-        return history;
-    }
+    @SerializedName("history")
+    @Expose
+    public List<HistoryEntity> history;
 
     public static class TodayEntity {
-        private String date;
-        private String week;
-        private String curTemp;
-        private String aqi;
-        private String fengxiang;
-        private String fengli;
-        private String hightemp;
-        private String lowtemp;
-        private String type;
 
-        private List<IndexEntity> index;
+        @SerializedName("date")
+        @Expose
+        public String date;
 
-        public void setDate(String date) {
-            this.date = date;
-        }
+        @SerializedName("week")
+        @Expose
+        public String week;
 
-        public void setWeek(String week) {
-            this.week = week;
-        }
+        @SerializedName("curTemp")
+        @Expose
+        public String curTemp;
 
-        public void setCurTemp(String curTemp) {
-            this.curTemp = curTemp;
-        }
+        @SerializedName("aqi")
+        @Expose
+        public String aqi;
 
-        public void setAqi(String aqi) {
-            this.aqi = aqi;
-        }
+        @SerializedName("fengxiang")
+        @Expose
+        public String fengxiang;
 
-        public void setFengxiang(String fengxiang) {
-            this.fengxiang = fengxiang;
-        }
+        @SerializedName("fengli")
+        @Expose
+        public String fengli;
 
-        public void setFengli(String fengli) {
-            this.fengli = fengli;
-        }
+        @SerializedName("hightemp")
+        @Expose
+        public String hightemp;
 
-        public void setHightemp(String hightemp) {
-            this.hightemp = hightemp;
-        }
+        @SerializedName("lowtemp")
+        @Expose
+        public String lowtemp;
 
-        public void setLowtemp(String lowtemp) {
-            this.lowtemp = lowtemp;
-        }
+        @SerializedName("type")
+        @Expose
+        public String type;
 
-        public void setType(String type) {
-            this.type = type;
-        }
-
-        public void setIndex(List<IndexEntity> index) {
-            this.index = index;
-        }
-
-        public String getDate() {
-            return date;
-        }
-
-        public String getWeek() {
-            return week;
-        }
-
-        public String getCurTemp() {
-            return curTemp;
-        }
-
-        public String getAqi() {
-            return aqi;
-        }
-
-        public String getFengxiang() {
-            return fengxiang;
-        }
-
-        public String getFengli() {
-            return fengli;
-        }
-
-        public String getHightemp() {
-            return hightemp;
-        }
-
-        public String getLowtemp() {
-            return lowtemp;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public List<IndexEntity> getIndex() {
-            return index;
-        }
+        @SerializedName("index")
+        @Expose
+        public List<IndexEntity> index;
 
         public static class IndexEntity {
-            private String name;
-            private String code;
-            private String index;
-            private String details;
-            private String otherName;
 
-            public void setName(String name) {
-                this.name = name;
-            }
+            @SerializedName("name")
+            @Expose
+            public String name;
 
-            public void setCode(String code) {
-                this.code = code;
-            }
+            @SerializedName("code")
+            @Expose
+            public String code;
 
-            public void setIndex(String index) {
-                this.index = index;
-            }
+            @SerializedName("index")
+            @Expose
+            public String index;
 
-            public void setDetails(String details) {
-                this.details = details;
-            }
+            @SerializedName("details")
+            @Expose
+            public String details;
 
-            public void setOtherName(String otherName) {
-                this.otherName = otherName;
-            }
-
-            public String getName() {
-                return name;
-            }
-
-            public String getCode() {
-                return code;
-            }
-
-            public String getIndex() {
-                return index;
-            }
-
-            public String getDetails() {
-                return details;
-            }
-
-            public String getOtherName() {
-                return otherName;
-            }
+            @SerializedName("otherName")
+            @Expose
+            public String otherName;
         }
     }
 
     public static class ForecastEntity {
-        private String date;
-        private String week;
-        private String fengxiang;
-        private String fengli;
-        private String hightemp;
-        private String lowtemp;
-        private String type;
 
-        public void setDate(String date) {
-            this.date = date;
-        }
+        @SerializedName("date")
+        @Expose
+        public String date;
 
-        public void setWeek(String week) {
-            this.week = week;
-        }
+        @SerializedName("week")
+        @Expose
+        public String week;
 
-        public void setFengxiang(String fengxiang) {
-            this.fengxiang = fengxiang;
-        }
+        @SerializedName("fengxiang")
+        @Expose
+        public String fengxiang;
 
-        public void setFengli(String fengli) {
-            this.fengli = fengli;
-        }
+        @SerializedName("fengli")
+        @Expose
+        public String fengli;
 
-        public void setHightemp(String hightemp) {
-            this.hightemp = hightemp;
-        }
+        @SerializedName("hightemp")
+        @Expose
+        public String hightemp;
 
-        public void setLowtemp(String lowtemp) {
-            this.lowtemp = lowtemp;
-        }
+        @SerializedName("lowtemp")
+        @Expose
+        public String lowtemp;
 
-        public void setType(String type) {
-            this.type = type;
-        }
-
-        public String getDate() {
-            return date;
-        }
-
-        public String getWeek() {
-            return week;
-        }
-
-        public String getFengxiang() {
-            return fengxiang;
-        }
-
-        public String getFengli() {
-            return fengli;
-        }
-
-        public String getHightemp() {
-            return hightemp;
-        }
-
-        public String getLowtemp() {
-            return lowtemp;
-        }
-
-        public String getType() {
-            return type;
-        }
+        @SerializedName("type")
+        @Expose
+        public String type;
     }
 
     public static class HistoryEntity {
-        private String date;
-        private String week;
-        private String aqi;
-        private String fengxiang;
-        private String fengli;
-        private String hightemp;
-        private String lowtemp;
-        private String type;
 
-        public void setDate(String date) {
-            this.date = date;
-        }
+        @SerializedName("date")
+        @Expose
+        public String date;
 
-        public void setWeek(String week) {
-            this.week = week;
-        }
+        @SerializedName("week")
+        @Expose
+        public String week;
 
-        public void setAqi(String aqi) {
-            this.aqi = aqi;
-        }
+        @SerializedName("aqi")
+        @Expose
+        public String aqi;
 
-        public void setFengxiang(String fengxiang) {
-            this.fengxiang = fengxiang;
-        }
+        @SerializedName("fengxiang")
+        @Expose
+        public String fengxiang;
 
-        public void setFengli(String fengli) {
-            this.fengli = fengli;
-        }
+        @SerializedName("fengli")
+        @Expose
+        public String fengli;
 
-        public void setHightemp(String hightemp) {
-            this.hightemp = hightemp;
-        }
+        @SerializedName("hightemp")
+        @Expose
+        public String hightemp;
 
-        public void setLowtemp(String lowtemp) {
-            this.lowtemp = lowtemp;
-        }
+        @SerializedName("lowtemp")
+        @Expose
+        public String lowtemp;
 
-        public void setType(String type) {
-            this.type = type;
-        }
-
-        public String getDate() {
-            return date;
-        }
-
-        public String getWeek() {
-            return week;
-        }
-
-        public String getAqi() {
-            return aqi;
-        }
-
-        public String getFengxiang() {
-            return fengxiang;
-        }
-
-        public String getFengli() {
-            return fengli;
-        }
-
-        public String getHightemp() {
-            return hightemp;
-        }
-
-        public String getLowtemp() {
-            return lowtemp;
-        }
-
-        public String getType() {
-            return type;
-        }
+        @SerializedName("type")
+        @Expose
+        public String type;
     }
 }

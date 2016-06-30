@@ -30,9 +30,9 @@
     <string name="about">关于</string>
     <string name="author">关于作者</string>
     <string name="introduce">应用介绍</string>
-    <string name="summary">一个基于material design的天气app，网络请求采用retrofit 2.0 + rxjava + eventbus， 也使用了三个自定义的view用于展示日出日落， 七天天气预报，空气质量。</string>
+    <string name="summary">一个基于material design的天气app，网络请求采用retrofit 2.0 + rxjava， 也使用了三个自定义的view用于展示日出日落， 七天天气预报，空气质量。</string>
     <string name="author_introduce">一个自学Android的电气狗Y(^_^)Y</string>
-    <string name="email_title">邮箱：</string>
+    <string name="email_title">邮箱</string>
     <string name="emai_summary">sanousun@163.com</string>
     <string name="github_title">github</string>
     <string name="github_summary">http://github.com/sanousun</string>
@@ -41,4 +41,5 @@
     <string name="content">技术支持</string>
     <string name="location">定位服务</string>
     <string name="Gaode">高德地图sdk</string>
+    <string name="version">版本</string>
 </resources>

@@ -7,6 +7,7 @@ public class StringUtil {
     }
 
     public static String getDay(String d) {
+        if (d.length() < 10) return "";
         StringBuilder s = new StringBuilder();
         for (int i = 5; i < 10; i++) {
             if (i == 7) {

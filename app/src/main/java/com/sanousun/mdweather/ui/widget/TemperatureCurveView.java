@@ -14,7 +14,7 @@ import static java.lang.Math.*;
 
 public class TemperatureCurveView extends View {
 
-    private float smooth_value = 1.0f;
+    private static final float smooth_value = 1.0f;
     private int[] temperatures;
     private String[] clocks;
     private Point[] points;
@@ -196,7 +196,7 @@ public class TemperatureCurveView extends View {
         curvePath.cubicTo(ctrl1_x, ctrl1_y, ctrl2_x, ctrl2_y, p2.getX(), p2.getY());
     }
 
-    static class Point {
+    private static class Point {
         private String clock;
         private int temperature;
         private float x;

@@ -19,7 +19,7 @@ import com.sanousun.mdweather.support.util.DensityUtil;
  */
 public class SevenDaysWeatherView extends View {
 
-    public static final String[] WEEKDAYS =
+    private static final String[] WEEKDAYS =
             {"周一", "周二", "周三", "周四", "周五", "周六", "周日"};
     private static final int WEATHER_COUNT = 7;
 
@@ -245,8 +245,8 @@ public class SevenDaysWeatherView extends View {
             int x = mViewRight / 14 * (2 * i + 1);
             int yh = getYFromBottom(mWeather[i].getMaxTemp());
             int yl = getYFromBottom(mWeather[i].getMinTemp());
-            String text_h = String.format("%d°", mWeather[i].getMaxTemp());
-            String text_l = String.format("%d°", mWeather[i].getMinTemp());
+            String text_h = String.format("%s°", String.valueOf(mWeather[i].getMaxTemp()));
+            String text_l = String.format("%s°", String.valueOf(mWeather[i].getMinTemp()));
             canvas.drawCircle(x, yh, 8, mPointPaint);
             canvas.drawCircle(x, yl, 8, mPointPaint);
             Rect textRect = new Rect();
