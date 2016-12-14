@@ -386,6 +386,14 @@ public class MainActivity extends BaseActivity
                 //显示错误信息
                 if (NetworkUtil.isNetworkConnected(this)) {
                     Toast.makeText(this, aMapLocation.getErrorInfo(), Toast.LENGTH_SHORT).show();
+                    Subscription subscription = WeatherApiUtil.getWeatherApi()
+                            .getSimpleWeatherForLoc("杭州")
+                            .compose(WeatherApiUtil.composeFilter(new SimpleErrorVerify(this, mRefreshLayout)))
+                            .subscribe(simpleWeatherBean -> {
+                                mSimpleWeather = simpleWeatherBean;
+                                updateHeader();
+                            });
+                    mCompositeSubscription.add(subscription);
                 } else {
                     Toast.makeText(this, "网络未连接", Toast.LENGTH_SHORT).show();
                 }
