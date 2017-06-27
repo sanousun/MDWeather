@@ -8,8 +8,8 @@ import com.sanousun.mdweather.R
 import com.sanousun.mdweather.support.util.LogUtil
 import com.sanousun.mdweather.ui.adapter.CityAdapter
 import com.sanousun.mdweather.ui.widget.SimpleDividerDecoration
-import kotlinx.android.synthetic.main.activity_citylists.*
-import kotlinx.android.synthetic.main.view_toolbar.*
+import kotlinx.android.synthetic.main.activity_city_list.*
+import kotlinx.android.synthetic.main.include_toolbar.*
 
 /**
  * Created by dashu on 2017/6/25.

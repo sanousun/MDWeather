@@ -3,7 +3,7 @@ package com.sanousun.mdweather.activity
 import android.os.Bundle
 import com.sanousun.mdweather.R
 import com.sanousun.mdweather.ui.fragment.AboutFragment
-import kotlinx.android.synthetic.main.view_toolbar.*
+import kotlinx.android.synthetic.main.include_toolbar.*
 
 /**
  * Created by dashu on 2017/6/27.

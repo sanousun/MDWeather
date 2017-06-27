@@ -16,7 +16,7 @@ import com.sanousun.mdweather.ui.adapter.DailyAdapter
 import com.sanousun.mdweather.ui.adapter.HourlyAdapter
 import com.sanousun.mdweather.ui.adapter.SuggestionAdapter
 import com.sanousun.mdweather.ui.widget.SimpleDividerDecoration
-import kotlinx.android.synthetic.main.activity_mains.*
+import kotlinx.android.synthetic.main.activity_main.*
 
 /**
  * Created by dashu on 2017/6/25.
