@@ -10,9 +10,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 1;
 
     public static final String TABLE_NAME = "table_city_list";
+    public static final String TABLE_COL_ID = "column_id";
     public static final String TABLE_COL_CITY_NAME = "column_city_name";
     public static final String TABLE_COL_CITY_ID = "column_city_id";
-    public static final String TABLE_COL_ID = "column_id";
 
     private static final String TABLE_CREATE =
             "CREATE TABLE " + TABLE_NAME + "(" +

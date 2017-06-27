@@ -3,7 +3,7 @@
     <color name="colorPrimary">#3f51b5</color>
     <color name="colorPrimaryDark">#303f9f</color>
     <color name="colorAccent">#448aff</color>
-    //content background
+    <!--content background-->
     <color name="weather_fine">#ACD1EE</color>
     <color name="weather_fine_n">#2F4B8B</color>
     <color name="weather_cloudy">#86BBE5</color>
@@ -34,4 +34,7 @@
     <color name="red">#FF0000</color>
     <color name="purple">#800080</color>
     <color name="maroon">#800000</color>
+
+    <color name="drawablePrimary">#3D60A8</color>
+    <color name="divider_color">#AFAFAF</color>
 </resources>

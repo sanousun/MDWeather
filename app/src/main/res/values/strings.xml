@@ -42,4 +42,6 @@
     <string name="location">定位服务</string>
     <string name="Gaode">高德地图sdk</string>
     <string name="version">版本</string>
+
+    <string name="search_hint">请输入城市名，拼音或者坐标</string>
 </resources>

@@ -4,8 +4,10 @@
 
     <PreferenceCategory
         android:title="@string/version">
+
         <Preference
             android:summary="天气2.0"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -25,15 +27,20 @@
             android:key="github"
             android:summary="@string/github_summary"
             android:title="@string/github_title"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory
         android:title="@string/content">
+
         <Preference
             android:summary="@string/Gaode"
             android:title="@string/location"/>
+
         <Preference
             android:key="license"
             android:title="@string/license"/>
+
     </PreferenceCategory>
+
 </PreferenceScreen>

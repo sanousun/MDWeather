@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="AstronomyView">
+        <attr name="asv_clock_radio" format="dimension"/>
+        <attr name="asv_icon_radio" format="dimension"/>
+    </declare-styleable>
+</resources>

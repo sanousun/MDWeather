@@ -1,0 +1,25 @@
+package com.sanousun.mdweather.support.util
+
+import android.content.Context
+import android.graphics.Point
+import android.view.WindowManager
+
+/**
+ * Created by dashu on 2017/6/22.
+ * Context的扩展
+ */
+
+class ContextExtension
+
+fun Context.getScreenWidth(): Int {
+    val wm: WindowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+    val point: Point = Point()
+    wm.defaultDisplay.getSize(point)
+    return point.x
+}
+
+fun Context.dpToPx(dpValue: Int): Int {
+    val scale = resources.displayMetrics.density
+    return (dpValue * scale + 0.5f).toInt()
+}
+
