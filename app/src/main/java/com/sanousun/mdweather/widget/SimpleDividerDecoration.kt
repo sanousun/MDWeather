@@ -1,4 +1,4 @@
-package com.sanousun.mdweather.ui.widget
+package com.sanousun.mdweather.widget
 
 import android.content.Context
 import android.graphics.Canvas
@@ -14,18 +14,18 @@ import com.sanousun.mdweather.R
  * recyclerView分割线的简单实现
  */
 
-class SimpleDividerDecoration(context: Context) : RecyclerView.ItemDecoration() {
+class SimpleDividerDecoration(context: android.content.Context) : android.support.v7.widget.RecyclerView.ItemDecoration() {
 
     private var dividerHeight: Int = 0
-    private var dividerPaint: Paint = Paint()
+    private var dividerPaint: android.graphics.Paint = android.graphics.Paint()
     var includeBottom = false
 
-    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+    override fun getItemOffsets(outRect: android.graphics.Rect, view: android.view.View, parent: android.support.v7.widget.RecyclerView, state: android.support.v7.widget.RecyclerView.State) {
         super.getItemOffsets(outRect, view, parent, state)
         outRect.bottom = dividerHeight
     }
 
-    override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
+    override fun onDraw(c: android.graphics.Canvas, parent: android.support.v7.widget.RecyclerView, state: android.support.v7.widget.RecyclerView.State) {
         val childCount = parent.childCount
         val left = parent.paddingLeft
         val right = parent.width - parent.paddingRight
@@ -39,7 +39,7 @@ class SimpleDividerDecoration(context: Context) : RecyclerView.ItemDecoration() 
     }
 
     init {
-        dividerPaint.color = ContextCompat.getColor(context, R.color.divider_color)
-        dividerHeight = context.resources.getDimensionPixelSize(R.dimen.divider_height)
+        dividerPaint.color = android.support.v4.content.ContextCompat.getColor(context, com.sanousun.mdweather.R.color.divider_color)
+        dividerHeight = context.resources.getDimensionPixelSize(com.sanousun.mdweather.R.dimen.divider_height)
     }
 }

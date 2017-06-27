@@ -1,4 +1,4 @@
-package com.sanousun.mdweather.ui.widget
+package com.sanousun.mdweather.widget
 
 import android.content.Context
 import android.content.res.TypedArray

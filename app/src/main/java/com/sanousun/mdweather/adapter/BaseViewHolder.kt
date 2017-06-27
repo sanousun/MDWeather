@@ -1,4 +1,4 @@
-package com.sanousun.mdweather.ui.adapter
+package com.sanousun.mdweather.adapter
 
 import android.content.Context
 import android.support.annotation.LayoutRes

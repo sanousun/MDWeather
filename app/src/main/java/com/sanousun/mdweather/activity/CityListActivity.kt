@@ -11,8 +11,8 @@ import com.sanousun.mdweather.network.WeatherApiService
 import com.sanousun.mdweather.rxmethod.ErrorReturn
 import com.sanousun.mdweather.rxmethod.RxTransferHelper
 import com.sanousun.mdweather.support.db.DataSource
-import com.sanousun.mdweather.ui.adapter.CityAdapter
-import com.sanousun.mdweather.ui.widget.SimpleDividerDecoration
+import com.sanousun.mdweather.adapter.CityAdapter
+import com.sanousun.mdweather.widget.SimpleDividerDecoration
 import kotlinx.android.synthetic.main.activity_city_list.*
 import kotlinx.android.synthetic.main.include_toolbar.*
 

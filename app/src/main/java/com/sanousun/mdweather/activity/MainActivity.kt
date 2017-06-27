@@ -12,10 +12,10 @@ import com.sanousun.mdweather.model.response.WeatherResponse
 import com.sanousun.mdweather.network.WeatherApiService
 import com.sanousun.mdweather.rxmethod.ErrorReturn
 import com.sanousun.mdweather.rxmethod.RxTransferHelper
-import com.sanousun.mdweather.ui.adapter.DailyAdapter
-import com.sanousun.mdweather.ui.adapter.HourlyAdapter
-import com.sanousun.mdweather.ui.adapter.SuggestionAdapter
-import com.sanousun.mdweather.ui.widget.SimpleDividerDecoration
+import com.sanousun.mdweather.adapter.DailyAdapter
+import com.sanousun.mdweather.adapter.HourlyAdapter
+import com.sanousun.mdweather.adapter.SuggestionAdapter
+import com.sanousun.mdweather.widget.SimpleDividerDecoration
 import kotlinx.android.synthetic.main.activity_main.*
 
 /**

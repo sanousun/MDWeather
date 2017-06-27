@@ -1,4 +1,4 @@
-package com.sanousun.mdweather.ui.fragment
+package com.sanousun.mdweather.fragment
 
 import android.app.AlertDialog
 import android.content.ClipData

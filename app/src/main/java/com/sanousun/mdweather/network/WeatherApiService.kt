@@ -1,6 +1,5 @@
 package com.sanousun.mdweather.network
 
-import com.sanousun.mdweather.app.HttpLoggingInterceptor
 import com.sanousun.mdweather.model.response.CityResponse
 import com.sanousun.mdweather.model.response.Response
 import com.sanousun.mdweather.model.response.WeatherResponse

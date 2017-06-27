@@ -1,4 +1,4 @@
-package com.sanousun.mdweather.app;
+package com.sanousun.mdweather.network;
 
 import com.sanousun.mdweather.support.util.LogUtil;
 

@@ -1,4 +1,4 @@
-package com.sanousun.mdweather.ui.adapter
+package com.sanousun.mdweather.adapter
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView

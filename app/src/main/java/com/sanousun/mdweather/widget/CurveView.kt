@@ -1,14 +1,5 @@
-package com.sanousun.mdweather.ui.widget
+package com.sanousun.mdweather.widget
 
-import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Path
-import android.graphics.Rect
-import android.text.TextPaint
-import android.util.AttributeSet
-import android.view.View
-import com.sanousun.mdweather.model.Temperature
 import com.sanousun.mdweather.support.util.drawTextWithCenter
 
 /**
@@ -16,27 +7,27 @@ import com.sanousun.mdweather.support.util.drawTextWithCenter
  * 展示最高温度最低温度趋势折线的视图
  */
 
-class CurveView : View {
+class CurveView : android.view.View {
 
     /** 表示温度的圆点半径*/
     var pointRadio = 0
     /** 圆点描述文字的大小*/
     var descTextSize = 0
     /** 圆点描述文字的画笔*/
-    val descTextPaint: TextPaint = TextPaint()
+    val descTextPaint: android.text.TextPaint = android.text.TextPaint()
     /** 折线的画笔*/
-    val curvePaint: Paint = Paint()
+    val curvePaint: android.graphics.Paint = android.graphics.Paint()
     /** 折线的路径*/
-    val curvePath: Path = Path()
+    val curvePath: android.graphics.Path = android.graphics.Path()
 
     /** 当前温度*/
-    var tempNow: Temperature? = null
+    var tempNow: com.sanousun.mdweather.model.Temperature? = null
     /** 前一天的温度，用于展示左折线*/
-    var tempPre: Temperature? = null
+    var tempPre: com.sanousun.mdweather.model.Temperature? = null
     /** 后一天的温度，用于展示右折线*/
-    var tempNext: Temperature? = null
+    var tempNext: com.sanousun.mdweather.model.Temperature? = null
     /** 温度范围*/
-    var tempRange: Temperature? = null
+    var tempRange: com.sanousun.mdweather.model.Temperature? = null
 
     /** 上顶点位置*/
     var top = 0F
@@ -51,20 +42,20 @@ class CurveView : View {
     /** 右下顶点位置*/
     var endBottom = 0F
 
-    constructor(context: Context) : this(context, null)
+    constructor(context: android.content.Context) : this(context, null)
 
-    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
+    constructor(context: android.content.Context, attrs: android.util.AttributeSet?) : this(context, attrs, 0)
 
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
+    constructor(context: android.content.Context, attrs: android.util.AttributeSet?, defStyleAttr: Int) :
             super(context, attrs, defStyleAttr) {
         initData(attrs)
     }
 
-    fun initData(attrs: AttributeSet?) {
-        descTextPaint.textAlign = Paint.Align.CENTER
+    fun initData(attrs: android.util.AttributeSet?) {
+        descTextPaint.textAlign = android.graphics.Paint.Align.CENTER
     }
 
-    fun setTemp(now: Temperature, pre: Temperature?, next: Temperature?, range: Temperature) {
+    fun setTemp(now: com.sanousun.mdweather.model.Temperature, pre: com.sanousun.mdweather.model.Temperature?, next: com.sanousun.mdweather.model.Temperature?, range: com.sanousun.mdweather.model.Temperature) {
         tempNow = now
         tempPre = pre
         tempNext = next
@@ -72,7 +63,7 @@ class CurveView : View {
         calcCoordinates()
     }
 
-    override fun draw(canvas: Canvas?) {
+    override fun draw(canvas: android.graphics.Canvas?) {
         super.draw(canvas)
         drawCurve(canvas)
         drawText(canvas)
@@ -81,7 +72,7 @@ class CurveView : View {
     /**
      * 画出折线图
      */
-    fun drawCurve(canvas: Canvas?) {
+    fun drawCurve(canvas: android.graphics.Canvas?) {
         val midX = width / 2
         curvePath.reset()
         //画出范围曲线
@@ -105,8 +96,8 @@ class CurveView : View {
     /**
      * 画出点的描述文字
      */
-    fun drawText(canvas: Canvas?) {
-        val tRect = Rect()
+    fun drawText(canvas: android.graphics.Canvas?) {
+        val tRect = android.graphics.Rect()
         val min = (tempNow?.min ?: 0).toString()
         val max = (tempNow?.max ?: 0).toString()
         val midWidth = measuredWidth / 2
