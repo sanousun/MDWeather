@@ -51,6 +51,10 @@ abstract class BaseAdapter<T, V : BaseViewHolder<T>>(val context: Context) : Rec
         notifyItemRemoved(pos)
     }
 
+    fun getItemData(pos: Int): T {
+        return mData[pos]
+    }
+
     abstract override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): V
 
     override fun onBindViewHolder(holder: V, position: Int) {

@@ -18,6 +18,7 @@ class SimpleDividerDecoration(context: Context) : RecyclerView.ItemDecoration() 
 
     private var dividerHeight: Int = 0
     private var dividerPaint: Paint = Paint()
+    var includeBottom = false
 
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
         super.getItemOffsets(outRect, view, parent, state)
@@ -28,8 +29,8 @@ class SimpleDividerDecoration(context: Context) : RecyclerView.ItemDecoration() 
         val childCount = parent.childCount
         val left = parent.paddingLeft
         val right = parent.width - parent.paddingRight
-
-        for (i in 0..childCount - 1 - 1) {
+        val total = if (includeBottom) childCount - 1 else childCount - 1 - 1
+        for (i in 0..total) {
             val view = parent.getChildAt(i)
             val top = view.bottom
             val bottom = view.bottom + dividerHeight

@@ -14,8 +14,15 @@ import kotlinx.android.synthetic.main.item_location.view.*
 class CityAdapter(context: Context) :
         BaseAdapter<BasicCity, CityAdapter.CityHolder>(context) {
 
+    var itemClickListener: ((city: BasicCity) -> Unit)? = null
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CityHolder {
         return CityHolder(parent, R.layout.item_location)
+    }
+
+    override fun onBindViewHolder(holder: CityHolder, position: Int) {
+        super.onBindViewHolder(holder, position)
+        holder.itemView.setOnClickListener { itemClickListener?.invoke(getItemData(position)) }
     }
 
     class CityHolder(parent: ViewGroup, layoutId: Int) :

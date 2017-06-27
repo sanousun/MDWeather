@@ -27,6 +27,7 @@
     <color name="weather_haze">#7D7F7E</color>
     <color name="weather_haze_n">#535353</color>
 
+    <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
     <color name="green">#00FF00</color>
     <color name="yellow">#FFFF00</color>
