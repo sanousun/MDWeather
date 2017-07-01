@@ -40,7 +40,7 @@
         android:textSize="13sp"
         android:text="19°-21°"/>
 
-    <com.sanousun.mdweather.widget.CurveViewView-->
+    <!--<com.sanousun.mdweather.widget.CurveViewView>-->
         <!--android:id="@+id/cv_temp"-->
         <!--android:layout_width="match_parent"-->
         <!--android:layout_height="100dp"/>-->

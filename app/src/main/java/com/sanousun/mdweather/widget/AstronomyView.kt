@@ -8,9 +8,9 @@ import android.util.AttributeSet
 import android.view.View
 import com.sanousun.mdweather.R
 import com.sanousun.mdweather.model.Astronomy
-import com.sanousun.mdweather.support.util.DensityUtil
 import com.sanousun.mdweather.support.util.dpToPx
 import com.sanousun.mdweather.support.util.getScreenWidth
+import com.sanousun.mdweather.support.util.spToPx
 
 /**
  * Created by dashu on 2017/6/17.
@@ -152,7 +152,7 @@ class AstronomyView : View {
         val y = (curveBottom - curveRadio * Math.sin(arc * Math.PI / 180)).toFloat()
         curvePath.addCircle(x, y, clockRadio.toFloat(), Path.Direction.CW)
         canvas?.drawPath(curvePath, curvePaint)
-        textPaint.textSize = DensityUtil.sp2px(context, 16f).toFloat()
+        textPaint.textSize = context.spToPx(16).toFloat()
         val textRect = Rect()
         val currentHour = astronomy?.getCurrentHour() ?: "00"
         textPaint.getTextBounds(currentHour, 0, currentHour.length, textRect)

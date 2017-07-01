@@ -23,3 +23,7 @@ fun Context.dpToPx(dpValue: Int): Int {
     return (dpValue * scale + 0.5f).toInt()
 }
 
+fun Context.spToPx(spValue: Int): Int {
+    val scale = resources.displayMetrics.scaledDensity
+    return (spValue * scale + 0.5f).toInt()
+}

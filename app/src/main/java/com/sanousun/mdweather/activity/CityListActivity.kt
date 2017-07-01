@@ -6,12 +6,12 @@ import android.view.Menu
 import android.widget.Toast
 import com.miguelcatalan.materialsearchview.MaterialSearchView
 import com.sanousun.mdweather.R
+import com.sanousun.mdweather.adapter.CityAdapter
 import com.sanousun.mdweather.model.response.CityResponse
 import com.sanousun.mdweather.network.WeatherApiService
 import com.sanousun.mdweather.rxmethod.ErrorReturn
 import com.sanousun.mdweather.rxmethod.RxTransferHelper
 import com.sanousun.mdweather.support.db.DataSource
-import com.sanousun.mdweather.adapter.CityAdapter
 import com.sanousun.mdweather.widget.SimpleDividerDecoration
 import kotlinx.android.synthetic.main.activity_city_list.*
 import kotlinx.android.synthetic.main.include_toolbar.*
@@ -37,7 +37,6 @@ class CityListActivity : BaseActivity() {
         toolbar.title = "城市列表"
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
         fresh_layout.isEnabled = false
 
         search_view.setVoiceSearch(false)
@@ -46,7 +45,7 @@ class CityListActivity : BaseActivity() {
                 query?.let {
                     fresh_layout.isRefreshing = true
                     val subscription = WeatherApiService.create()
-                            .searchCity(query)
+                            .searchCity(it)
                             .compose(RxTransferHelper.composeFilter<CityResponse>(object : ErrorReturn {
                                 override fun errorStatus(status: String) {
                                     fresh_layout.isRefreshing = false
@@ -105,14 +104,17 @@ class CityListActivity : BaseActivity() {
 
     override fun onBackPressed() {
         if (search_view.isSearchOpen) {
-            search_view.closeSearch();
+            search_view.closeSearch()
         } else {
-            super.onBackPressed();
+            super.onBackPressed()
         }
     }
 
     fun loadCityData() {
-        cityAdapter.itemClickListener = { city -> TODO() }
+        cityAdapter.itemClickListener = {
+            (id) ->
+            startActivity(MainActivity.createIntent(this, id))
+        }
         cityAdapter.clear()
         val list = DataSource.getInstance(this)?.getCityList()
         list?.let { cityAdapter.addAll(list) }

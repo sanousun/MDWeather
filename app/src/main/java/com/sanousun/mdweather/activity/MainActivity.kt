@@ -1,5 +1,6 @@
 package com.sanousun.mdweather.activity
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
@@ -8,13 +9,13 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import com.sanousun.mdweather.R
+import com.sanousun.mdweather.adapter.DailyAdapter
+import com.sanousun.mdweather.adapter.HourlyAdapter
+import com.sanousun.mdweather.adapter.SuggestionAdapter
 import com.sanousun.mdweather.model.response.WeatherResponse
 import com.sanousun.mdweather.network.WeatherApiService
 import com.sanousun.mdweather.rxmethod.ErrorReturn
 import com.sanousun.mdweather.rxmethod.RxTransferHelper
-import com.sanousun.mdweather.adapter.DailyAdapter
-import com.sanousun.mdweather.adapter.HourlyAdapter
-import com.sanousun.mdweather.adapter.SuggestionAdapter
 import com.sanousun.mdweather.widget.SimpleDividerDecoration
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -25,9 +26,20 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : BaseActivity() {
 
+    companion object {
+        val EXTRA_CITY = "extra_city"
+        fun createIntent(context: Context, city: String): Intent {
+            val intent = Intent(context, MainActivity::class.java)
+            intent.putExtra(EXTRA_CITY, city)
+            return intent
+        }
+    }
+
     private val dailyAdapter by lazy { DailyAdapter(this) }
     private val hourlyAdapter by lazy { HourlyAdapter(this) }
     private val suggestAdapter by lazy { SuggestionAdapter(this) }
+
+    private var city: String = "hangzhou"
 
     override fun setLayoutId(): Int {
         return R.layout.activity_main
@@ -35,10 +47,22 @@ class MainActivity : BaseActivity() {
 
     override fun initData(savedInstanceState: Bundle?) {
         if (savedInstanceState != null) {
-
+            city = savedInstanceState.getString(EXTRA_CITY) ?: city
         } else {
-
+            city = "hangzhou"
         }
+        loadData()
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        city = intent?.getStringExtra(EXTRA_CITY) ?: city
+        loadData()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        outState?.putString(EXTRA_CITY, city)
     }
 
     override fun initView() {
@@ -94,7 +118,7 @@ class MainActivity : BaseActivity() {
     fun loadData() {
         rf_layout.isRefreshing = true
         val subscription = WeatherApiService.create()
-                .getWeatherByCity("hangzhou")
+                .getWeatherByCity(city)
                 .compose(RxTransferHelper.composeFilter<WeatherResponse>(object : ErrorReturn {
                     override fun errorStatus(status: String) {
                         rf_layout.isRefreshing = false
@@ -130,5 +154,6 @@ class MainActivity : BaseActivity() {
         if (weather.suggestion != null) {
             suggestAdapter.addAll(weather.suggestion.getSuggestList())
         }
+        toolbar.title = weather.basic?.city
     }
 }
