@@ -73,7 +73,7 @@ class MainActivity : BaseActivity() {
         rv_daily_forecast.adapter = dailyAdapter
         //初始化小时天气预报
         rv_hourly_forecast.layoutManager =
-                GridLayoutManager(this, 1, LinearLayoutManager.VERTICAL, false)
+                LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         rv_hourly_forecast.adapter = hourlyAdapter
         //初始化天气指数
         rv_suggest_forecast.layoutManager =

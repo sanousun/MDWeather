@@ -26,6 +26,10 @@ class HourlyAdapter(context: Context) :
             itemView.tv_time.text = t.date.changeFormat("yyyy-MM-dd HH:mm", "HH:mm")
             itemView.iv_weather.text = t.cond.txt
             itemView.tv_temp.text = String.format("%d°", t.tmp)
+            itemView.tv_humidity.text = String.format("相对湿度: %d%%", t.hum)
+            itemView.tv_probability.text = String.format("降水概率: %d%%", t.pop)
+            itemView.tv_wind_direction.text = t.wind.dir
+            itemView.tv_wind_speed.text = String.format("%dm/s", t.wind.spd)
         }
     }
 }
