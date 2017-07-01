@@ -116,14 +116,17 @@ class CityListActivity : BaseActivity() {
             startActivity(MainActivity.createIntent(this, id))
         }
         cityAdapter.clear()
-        val list = DataSource.getInstance(this)?.getCityList()
-        list?.let { cityAdapter.addAll(list) }
+        DataSource.getInstance(this)?.getCityList()?.let {
+            cityAdapter.addAll(it)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_city_list, menu)
-        val item = menu?.findItem(R.id.action_search)
-        search_view.setMenuItem(item)
+        menu?.let {
+            menuInflater.inflate(R.menu.menu_city_list, it)
+            val item = it.findItem(R.id.action_search)
+            search_view.setMenuItem(item)
+        }
         return super.onCreateOptionsMenu(menu)
     }
 }

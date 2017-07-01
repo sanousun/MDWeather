@@ -174,21 +174,22 @@ class MainActivity : BaseActivity() {
     }
 
     fun fillContent(weather: WeatherResponse) {
+        toolbar.title = weather.basic?.city
         tv_temp.text = String.format("%d°", weather.now?.tmp)
         tv_weather.text = weather.now?.cond?.txt
         tv_wind.text = String.format("%s %s", weather.now?.wind?.dir, weather.now?.wind?.sc)
+
         dailyAdapter.clear()
-        if (weather.daily_forecast != null) {
-            dailyAdapter.addAll(weather.daily_forecast)
+        weather.daily_forecast?.let {
+            dailyAdapter.addAll(it)
         }
         hourlyAdapter.clear()
-        if (weather.hourly_forecast != null) {
-            hourlyAdapter.addAll(weather.hourly_forecast)
+        weather.hourly_forecast?.let {
+            hourlyAdapter.addAll(it)
         }
         suggestAdapter.clear()
-        if (weather.suggestion != null) {
-            suggestAdapter.addAll(weather.suggestion.getSuggestList())
+        weather.suggestion?.let {
+            suggestAdapter.addAll(it.getSuggestList())
         }
-        toolbar.title = weather.basic?.city
     }
 }
