@@ -14,6 +14,12 @@ android {
         versionCode 2
         versionName "2.0"
     }
+    defaultConfig {
+        manifestPlaceholders = [
+                "gaode_key": GAODE_KEY
+        ]
+        buildConfigField "String", "WEATHER_KEY", WEATHER_KEY
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -45,5 +51,6 @@ dependencies {
     compile 'com.facebook.stetho:stetho:1.5.0'
     compile 'de.psdev.licensesdialog:licensesdialog:1.8.0'
     compile 'com.miguelcatalan:materialsearchview:1.4.0'
+    compile 'com.tbruyelle.rxpermissions:rxpermissions:0.9.4@aar'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 }

@@ -29,14 +29,14 @@
 
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="b89f0ee42292f58970bcc5c69f619e90"/>
+            android:value="${gaode_key}"/>
 
         <service android:name="com.amap.api.location.APSService"/>
 
         <activity
             android:name=".activity.MainActivity"
-            android:screenOrientation="portrait"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Transparent">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

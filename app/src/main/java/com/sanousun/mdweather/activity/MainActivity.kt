@@ -1,5 +1,6 @@
 package com.sanousun.mdweather.activity
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -8,6 +9,9 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import com.amap.api.location.AMapLocation
+import com.amap.api.location.AMapLocationClient
+import com.amap.api.location.AMapLocationClientOption
 import com.sanousun.mdweather.R
 import com.sanousun.mdweather.adapter.DailyAdapter
 import com.sanousun.mdweather.adapter.HourlyAdapter
@@ -16,7 +20,9 @@ import com.sanousun.mdweather.model.response.WeatherResponse
 import com.sanousun.mdweather.network.WeatherApiService
 import com.sanousun.mdweather.rxmethod.ErrorReturn
 import com.sanousun.mdweather.rxmethod.RxTransferHelper
+import com.sanousun.mdweather.support.util.LogUtil
 import com.sanousun.mdweather.widget.SimpleDividerDecoration
+import com.tbruyelle.rxpermissions.RxPermissions
 import kotlinx.android.synthetic.main.activity_main.*
 
 /**
@@ -39,7 +45,10 @@ class MainActivity : BaseActivity() {
     private val hourlyAdapter by lazy { HourlyAdapter(this) }
     private val suggestAdapter by lazy { SuggestionAdapter(this) }
 
-    private var city: String = "hangzhou"
+    private val aMapLocationClient by lazy { AMapLocationClient(this) }
+    private val rxPermission by lazy { RxPermissions(this) }
+
+    private var city: String = "杭州市"
 
     override fun setLayoutId(): Int {
         return R.layout.activity_main
@@ -48,15 +57,46 @@ class MainActivity : BaseActivity() {
     override fun initData(savedInstanceState: Bundle?) {
         if (savedInstanceState != null) {
             city = savedInstanceState.getString(EXTRA_CITY) ?: city
+            loadData()
         } else {
-            city = "hangzhou"
+            //启动定位
+            rxPermission
+                    .request(Manifest.permission.ACCESS_COARSE_LOCATION)
+                    .subscribe { granted ->
+                        if (granted) {
+                            aMapLocationClient.setLocationListener {
+                                aMapLocation: AMapLocation? ->
+                                aMapLocation?.let {
+                                    if (it.errorCode == 0) {
+                                        LogUtil.e("国家：${it.country}，省份：${it.province}\n" +
+                                                "城市：${it.city} - ${it.cityCode}，地区：${it.district}")
+                                        toolbar.setLogo(R.drawable.ic_action_location)
+                                        city = it.city
+                                    } else {
+                                        LogUtil.e(it.errorInfo)
+                                        Toast.makeText(this, "定位失败，默认切换杭州", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                                loadData()
+                            }
+                            val option = AMapLocationClientOption()
+                            option.locationMode = AMapLocationClientOption.AMapLocationMode.Battery_Saving
+                            option.isOnceLocation = true
+                            aMapLocationClient.setLocationOption(option)
+                            aMapLocationClient.startLocation()
+                            rf_layout.isRefreshing = true
+                        } else {
+                            Toast.makeText(this, "定位权限获取失败，默认切换杭州", Toast.LENGTH_SHORT).show()
+                            loadData()
+                        }
+                    }
         }
-        loadData()
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         city = intent?.getStringExtra(EXTRA_CITY) ?: city
+        toolbar.logo = null
         loadData()
     }
 
@@ -86,11 +126,6 @@ class MainActivity : BaseActivity() {
             _, verticalOffset ->
             rf_layout.isEnabled = verticalOffset == 0
         }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        loadData()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

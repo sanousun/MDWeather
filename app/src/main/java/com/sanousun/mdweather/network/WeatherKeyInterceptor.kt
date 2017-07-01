@@ -1,6 +1,7 @@
 package com.sanousun.mdweather.network
 
 import android.util.Log
+import com.sanousun.mdweather.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.io.IOException
@@ -12,15 +13,11 @@ import java.io.IOException
 
 class WeatherKeyInterceptor : Interceptor {
 
-    companion object {
-        val KEY = "255bfaa117cd42799e185957e9714916"
-    }
-
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
         var request = chain.request()
         val httpUrlBuilder = request.url().newBuilder()
-        httpUrlBuilder.addQueryParameter("key", KEY)
+        httpUrlBuilder.addQueryParameter("key", BuildConfig.WEATHER_KEY)
         val requestBuilder = request.newBuilder()
         requestBuilder.url(httpUrlBuilder.build())
         Log.e("weatherApi", httpUrlBuilder.build().toString())

@@ -1,5 +1,7 @@
 MDWeather
 ========
+# 注意
+需要将 gradle.properties 中加上自己申请的高德地图的key和和风天气的key
 
 ## 前言
 最初的灵感来源于 materialup 上的一些天气应用设计，刚好那时候想着试试 retrofit + rxjava 的组合，于是这个应用的开发
@@ -11,7 +13,7 @@ MDWeather
 
 ## 计划
 1. 应用初步完成<br/>
-2. 定位待接入<br/>
+2. 高德定位接入<br/>
 3. 界面UI待美化<br/>
 
 ## 数据来源
