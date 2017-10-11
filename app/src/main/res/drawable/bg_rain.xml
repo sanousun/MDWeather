@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportHeight="200"
+    android:viewportWidth="200">
+
+    <path
+        android:fillColor="#196596"
+        android:pathData="M0,0 L200,0 L200,200 L0,200Z"/>
+
+    <group
+        android:name="rain01"
+        android:translateX="-80">
+
+        <path
+            android:pathData="M100,0 L80,40 M70,60 L20,160"
+            android:strokeColor="#6D8399"
+            android:strokeLineCap="round"
+            android:strokeWidth="4"/>
+    </group>
+
+    <group
+        android:name="rain02"
+        android:translateX="-40">
+
+        <path
+            android:pathData="M80,40 L50,100 M20,160 L0,200"
+            android:strokeColor="#6D8399"
+            android:strokeLineCap="round"
+            android:strokeWidth="4"/>
+    </group>
+
+    <group
+        android:name="rain03"
+        android:translateX="-20">
+
+        <path
+            android:pathData="M100,0 L90,20 M 70,60 L40,120"
+            android:strokeColor="#6D8399"
+            android:strokeLineCap="round"
+            android:strokeWidth="4"/>
+    </group>
+
+    <group
+        android:name="rain04"
+        android:translateX="0">
+
+        <path
+            android:pathData="M90,20 L80,40 M70,60 L40,120 M30,140 L20,160"
+            android:strokeColor="#6D8399"
+            android:strokeLineCap="round"
+            android:strokeWidth="4"/>
+    </group>
+
+    <group
+        android:name="rain05"
+        android:translateX="40">
+
+        <path
+            android:pathData="M90,20 L70,60 M 60,80 L10,180"
+            android:strokeColor="#6D8399"
+            android:strokeLineCap="round"
+            android:strokeWidth="4"/>
+    </group>
+
+    <group
+        android:name="rain06"
+        android:translateX="60">
+
+        <path
+            android:pathData="M100,0 L40,120 M30,140 L0,200"
+            android:strokeColor="#6D8399"
+            android:strokeLineCap="round"
+            android:strokeWidth="4"/>
+    </group>
+
+    <group
+        android:name="rain07"
+        android:translateX="80">
+
+        <path
+            android:pathData="M 60,80 L0,200"
+            android:strokeColor="#6D8399"
+            android:strokeLineCap="round"
+            android:strokeWidth="4"/>
+    </group>
+
+    <group
+        android:name="rain08"
+        android:translateX="120">
+
+        <path
+            android:pathData="M100,0 L60,80 M20,160 L0,200"
+            android:strokeColor="#6D8399"
+            android:strokeLineCap="round"
+            android:strokeWidth="4"/>
+    </group>
+
+    <group
+        android:name="rain09"
+        android:translateX="140">
+
+        <path
+            android:pathData="M100,0 L80,40 M30,140 L0,200"
+            android:strokeColor="#6D8399"
+            android:strokeLineCap="round"
+            android:strokeWidth="4"/>
+    </group>
+
+    <group
+        android:name="rain10"
+        android:translateX="160">
+
+        <path
+            android:pathData="M60,80 L30,140"
+            android:strokeColor="#6D8399"
+            android:strokeLineCap="round"
+            android:strokeWidth="4"/>
+    </group>
+
+</vector>

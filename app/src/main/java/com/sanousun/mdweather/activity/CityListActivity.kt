@@ -30,7 +30,6 @@ class CityListActivity : BaseActivity() {
     }
 
     override fun initData(savedInstanceState: Bundle?) {
-
     }
 
     override fun initView() {
@@ -110,6 +109,9 @@ class CityListActivity : BaseActivity() {
         }
     }
 
+    /**
+     * 从数据库中获取城市信息
+     */
     fun loadCityData() {
         cityAdapter.itemClickListener = {
             (id) ->

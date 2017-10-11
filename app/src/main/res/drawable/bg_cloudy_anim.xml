@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/bg_cloudy">
+
+    <target
+        android:name="sun"
+        android:animation="@animator/animator_sun"/>
+
+    <target
+        android:name="cloud01"
+        android:animation="@animator/animator_cloud01_tr"/>
+
+    <target
+        android:name="cloud03"
+        android:animation="@animator/animator_cloud03_tl"/>
+
+</animated-vector>

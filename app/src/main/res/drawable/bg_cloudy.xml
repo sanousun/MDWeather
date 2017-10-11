@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportHeight="200"
+    android:viewportWidth="200">
+
+    <group>
+
+        <path
+            android:fillColor="#79A6D1"
+            android:pathData="M0,0 L200,0 L200,200 L0,200Z"/>
+
+        <group
+            android:name="cloud01"
+            android:translateX="50"
+            android:translateY="5">
+
+            <path
+                android:fillAlpha=".5"
+                android:fillColor="#FFFFFF"
+                android:pathData="M5,50 A5,5 0 0 1 5,40 L25,40 A5,5 0 0 0 25,30 L10,30 A5,5 0 0 1 10,20 A5,5 0 0 0 15,15 A5,5 0 0 1 20,10 L70,10 A5,5 0 0 1 75,15 A5,5 90 0 0 80,20 L90,20 A5,5 0 0 1 90,30 A5,5 0 0 0 90,40 L95,40 A5,5 0 0 1 95,50 L70,50 A5,5 0 0 1 65,45 A5,5 0 0 0 60,40 L58,40 A5,5 0 0 0 53,45 A5,5 0 0 1 48,50 Z"/>
+        </group>
+
+        <group
+            android:name="sun"
+            android:translateX="90"
+            android:translateY="10"
+            android:pivotX="50"
+            android:pivotY="50">
+
+            <path
+                android:fillColor="#FFD754"
+                android:pathData="M25,50 A25,25 90 0 0 75,50 A25,25 90 0 0 25,50"/>
+
+            <path
+                android:pathData="M5,50 L15,50 M18,18 L25,25 M50,5 L50,15 M82,18 L75,25 M95,50 L85,50 M82,82 L75,75 M50,95 L50,85 M18,82 L25,75"
+                android:strokeColor="#FFD754"
+                android:strokeLineCap="round"
+                android:strokeWidth="5"/>
+        </group>
+
+        <group
+            android:name="cloud03"
+            android:translateX="100"
+            android:translateY="80">
+
+            <path
+                android:fillAlpha=".3"
+                android:fillColor="#FFFFFF"
+                android:pathData="M45,50 L85,50 A5,5 0 0 0 85,40 A5,5 0 0 1 85,30 L95,30 A5,5 0 0 0 95,20 L90,20 A5,5 0 0 1 85,15 A5,5 0 0 0 80,10 L45,10 L45,20 L55,20 A5,5 0 0 1 55,30 L45,30 A5,5 0 0 1 45,20 L45,10 L35,10 A5,5 0 0 0 30,15 A5,5 0 0 1 25,20 L5,20 A5,5 0 0 0 5,30 L15,30 A5,5 0 0 1 20,35 A5,5 0 0 0 25,40 L35,40 A5,5 0 0 1 40,45 A5,5 0 0 0 45,50"/>
+        </group>
+
+    </group>
+
+</vector>

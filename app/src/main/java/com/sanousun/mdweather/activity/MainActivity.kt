@@ -64,8 +64,7 @@ class MainActivity : BaseActivity() {
                     .request(Manifest.permission.ACCESS_COARSE_LOCATION)
                     .subscribe { granted ->
                         if (granted) {
-                            aMapLocationClient.setLocationListener {
-                                aMapLocation: AMapLocation? ->
+                            aMapLocationClient.setLocationListener { aMapLocation: AMapLocation? ->
                                 aMapLocation?.let {
                                     if (it.errorCode == 0) {
                                         LogUtil.e("国家：${it.country}，省份：${it.province}\n" +
@@ -107,6 +106,7 @@ class MainActivity : BaseActivity() {
 
     override fun initView() {
         setSupportActionBar(toolbar)
+        rf_layout.setProgressViewOffset(false, 0, 100)
         //初始化每日天气预报
         rv_daily_forecast.layoutManager =
                 GridLayoutManager(this, 3, LinearLayoutManager.VERTICAL, false)
@@ -122,8 +122,7 @@ class MainActivity : BaseActivity() {
         rv_suggest_forecast.addItemDecoration(SimpleDividerDecoration(this))
 
         rf_layout.setOnRefreshListener { loadData() }
-        ab_layout.addOnOffsetChangedListener {
-            _, verticalOffset ->
+        ab_layout.addOnOffsetChangedListener { _, verticalOffset ->
             rf_layout.isEnabled = verticalOffset == 0
         }
     }
@@ -165,8 +164,7 @@ class MainActivity : BaseActivity() {
                         Toast.makeText(this@MainActivity, th.message, Toast.LENGTH_SHORT).show()
                     }
                 }))
-                .subscribe {
-                    weather ->
+                .subscribe { weather ->
                     rf_layout.isRefreshing = false
                     fillContent(weather)
                 }
