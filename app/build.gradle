@@ -45,7 +45,7 @@ dependencies {
     compile "com.squareup.retrofit2:retrofit:$retrofit_ver"
     compile "com.squareup.retrofit2:converter-gson:$retrofit_ver"
     compile "com.squareup.retrofit2:adapter-rxjava:$retrofit_ver"
-    compile 'com.amap.api:location:3.6.0'
+    compile 'com.amap.api:location:3.6.1'
     compile 'de.psdev.licensesdialog:licensesdialog:1.8.0'
     compile 'com.miguelcatalan:materialsearchview:1.4.0'
     compile 'com.tbruyelle.rxpermissions:rxpermissions:0.9.4@aar'
