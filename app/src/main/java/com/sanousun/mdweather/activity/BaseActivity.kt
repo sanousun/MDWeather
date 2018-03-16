@@ -3,7 +3,7 @@ package com.sanousun.mdweather.activity
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
-import rx.subscriptions.CompositeSubscription
+import io.reactivex.disposables.CompositeDisposable
 
 /**
  * Created by dashu on 2017/6/25.
@@ -12,7 +12,7 @@ import rx.subscriptions.CompositeSubscription
 
 abstract class BaseActivity : AppCompatActivity() {
 
-    val subscriptions: CompositeSubscription = CompositeSubscription()
+    val disposables: CompositeDisposable = CompositeDisposable()
 
     /**
      * 获取布局文件id
@@ -38,7 +38,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        subscriptions.clear()
+        disposables.clear()
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {

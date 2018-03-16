@@ -22,7 +22,7 @@ import com.sanousun.mdweather.rxmethod.ErrorReturn
 import com.sanousun.mdweather.rxmethod.RxTransferHelper
 import com.sanousun.mdweather.support.util.LogUtil
 import com.sanousun.mdweather.widget.SimpleDividerDecoration
-import com.tbruyelle.rxpermissions.RxPermissions
+import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.activity_main.*
 
 /**
@@ -62,8 +62,8 @@ class MainActivity : BaseActivity() {
             //启动定位
             rxPermission
                     .request(Manifest.permission.ACCESS_COARSE_LOCATION)
-                    .subscribe { granted ->
-                        if (granted) {
+                    .subscribe {
+                        if (it) {
                             aMapLocationClient.setLocationListener { aMapLocation: AMapLocation? ->
                                 aMapLocation?.let {
                                     if (it.errorCode == 0) {
@@ -151,7 +151,7 @@ class MainActivity : BaseActivity() {
 
     fun loadData() {
         rf_layout.isRefreshing = true
-        val subscription = WeatherApiService.create()
+        val disposable = WeatherApiService.create()
                 .getWeatherByCity(city)
                 .compose(RxTransferHelper.composeFilter<WeatherResponse>(object : ErrorReturn {
                     override fun errorStatus(status: String) {
@@ -168,7 +168,7 @@ class MainActivity : BaseActivity() {
                     rf_layout.isRefreshing = false
                     fillContent(weather)
                 }
-        subscriptions.add(subscription)
+        disposables.add(disposable)
     }
 
     fun fillContent(weather: WeatherResponse) {

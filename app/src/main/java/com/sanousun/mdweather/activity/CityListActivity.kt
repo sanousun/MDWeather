@@ -3,7 +3,6 @@ package com.sanousun.mdweather.activity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
-import android.widget.Toast
 import com.miguelcatalan.materialsearchview.MaterialSearchView
 import com.sanousun.mdweather.R
 import com.sanousun.mdweather.adapter.CityAdapter
@@ -12,6 +11,7 @@ import com.sanousun.mdweather.network.WeatherApiService
 import com.sanousun.mdweather.rxmethod.ErrorReturn
 import com.sanousun.mdweather.rxmethod.RxTransferHelper
 import com.sanousun.mdweather.support.db.DataSource
+import com.sanousun.mdweather.support.util.toastShort
 import com.sanousun.mdweather.widget.SimpleDividerDecoration
 import kotlinx.android.synthetic.main.activity_city_list.*
 import kotlinx.android.synthetic.main.include_toolbar.*
@@ -43,30 +43,29 @@ class CityListActivity : BaseActivity() {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let {
                     fresh_layout.isRefreshing = true
-                    val subscription = WeatherApiService.create()
+                    val disposable = WeatherApiService.create()
                             .searchCity(it)
                             .compose(RxTransferHelper.composeFilter<CityResponse>(object : ErrorReturn {
                                 override fun errorStatus(status: String) {
                                     fresh_layout.isRefreshing = false
-                                    Toast.makeText(this@CityListActivity, status, Toast.LENGTH_SHORT).show()
+                                    toastShort(status)
                                 }
 
                                 override fun errorNetwork(th: Throwable) {
                                     fresh_layout.isRefreshing = false
-                                    Toast.makeText(this@CityListActivity, th.message, Toast.LENGTH_SHORT).show()
+                                    toastShort(th.message ?: "网络错误")
                                 }
                             }))
                             .map { cityResponse -> cityResponse.basic }
-                            .subscribe {
-                                city ->
+                            .subscribe { city ->
                                 fresh_layout.isRefreshing = false
                                 if (city == null) {
-                                    Toast.makeText(this@CityListActivity, "查询无结果", Toast.LENGTH_SHORT).show()
+                                    toastShort("查询无结果")
                                 } else {
                                     cityAdapter.add(city)
                                 }
                             }
-                    subscriptions.add(subscription)
+                    disposables.add(disposable)
                 }
                 return true
             }
@@ -82,8 +81,7 @@ class CityListActivity : BaseActivity() {
 
             override fun onSearchViewShown() {
                 cityAdapter.clear()
-                cityAdapter.itemClickListener = {
-                    city ->
+                cityAdapter.itemClickListener = { city ->
                     DataSource.getInstance(this@CityListActivity)?.save(city)
                     search_view.closeSearch()
                 }
@@ -113,8 +111,7 @@ class CityListActivity : BaseActivity() {
      * 从数据库中获取城市信息
      */
     fun loadCityData() {
-        cityAdapter.itemClickListener = {
-            (id) ->
+        cityAdapter.itemClickListener = { (id) ->
             startActivity(MainActivity.createIntent(this, id))
         }
         cityAdapter.clear()

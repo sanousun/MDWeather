@@ -3,9 +3,9 @@ package com.sanousun.mdweather.rxmethod
 import com.sanousun.mdweather.enums.ResponseStatusEnum
 import com.sanousun.mdweather.model.response.BaseResponse
 import com.sanousun.mdweather.model.response.Response
-import rx.Observable
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
+import io.reactivex.FlowableTransformer
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 /**
  * Created by dashu on 2017/6/25.
@@ -14,17 +14,10 @@ import rx.schedulers.Schedulers
 
 class RxTransferHelper {
     companion object {
-        fun <T : BaseResponse> composeFilter(errReturn: ErrorReturn): Observable.Transformer<Response<T>, T> {
-            return Observable.Transformer { t ->
+        fun <T : BaseResponse> composeFilter(errReturn: ErrorReturn): FlowableTransformer<Response<T>, T> {
+            return FlowableTransformer { t ->
                 t.subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .onErrorReturn { throwable ->
-                            errReturn.errorNetwork(throwable)
-                            null
-                        }
-                        .filter { response ->
-                            response != null
-                        }
                         .map { response -> response.getData() }
                         .filter { response ->
                             val statusEnum = ResponseStatusEnum.valueOfWithStatus(response.status)
@@ -34,6 +27,9 @@ class RxTransferHelper {
                                 errReturn.errorStatus(statusEnum.status)
                                 false
                             }
+                        }
+                        .doOnError {
+                            errReturn.errorNetwork(it)
                         }
             }
         }
