@@ -16,7 +16,7 @@ data class AirQualityIndex(
             /**
              * 一氧化碳指数
              */
-            val co: Int,
+            val co: Float,
             /**
              * 一氧化氮指数
              */

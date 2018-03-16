@@ -2,7 +2,11 @@ package com.sanousun.mdweather.widget
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Path
+import android.text.TextPaint
 import android.util.AttributeSet
+import android.view.View
 import com.sanousun.mdweather.model.Temperature
 import com.sanousun.mdweather.support.util.drawTextWithCenter
 
@@ -11,18 +15,18 @@ import com.sanousun.mdweather.support.util.drawTextWithCenter
  * 展示最高温度最低温度趋势折线的视图
  */
 
-class CurveView : android.view.View {
+class CurveView : View {
 
     /** 表示温度的圆点半径*/
     var pointRadio = 0
     /** 圆点描述文字的大小*/
     var descTextSize = 0
     /** 圆点描述文字的画笔*/
-    val descTextPaint: android.text.TextPaint = android.text.TextPaint()
+    val descTextPaint: TextPaint = TextPaint()
     /** 折线的画笔*/
-    val curvePaint: android.graphics.Paint = android.graphics.Paint()
+    val curvePaint: Paint = Paint()
     /** 折线的路径*/
-    val curvePath: android.graphics.Path = android.graphics.Path()
+    val curvePath: Path = Path()
 
     /** 当前温度*/
     var tempNow: Temperature? = null
