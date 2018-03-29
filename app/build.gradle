@@ -3,14 +3,13 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion '27.0.2'
+    compileSdkVersion versions.compileSdk
     defaultConfig {
         applicationId "com.sanousun.mdweather"
-        minSdkVersion 21
-        targetSdkVersion 27
-        versionCode 2
-        versionName "2.0"
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.compileSdk
+        versionCode versions.versionCode
+        versionName versions.versionName
     }
     signingConfigs {
         config {
@@ -41,25 +40,21 @@ android {
 }
 
 dependencies {
-    ext.support_ver = '27.1.0'
-    ext.retrofit_ver = '2.4.0'
-    ext.rxjava2_ver = '2.1.10'
-    ext.rxandroid_ver = '2.0.2'
-    ext.anko_ver = '0.10.1'
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    implementation "com.android.support:appcompat-v7:$support_ver"
-    implementation "com.android.support:cardview-v7:$support_ver"
-    implementation "com.android.support:recyclerview-v7:$support_ver"
-    implementation "com.android.support:design:$support_ver"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "io.reactivex.rxjava2:rxjava:$rxjava2_ver"
-    implementation "io.reactivex.rxjava2:rxandroid:$rxandroid_ver"
-    implementation "com.squareup.retrofit2:retrofit:$retrofit_ver"
-    implementation "com.squareup.retrofit2:converter-gson:$retrofit_ver"
-    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_ver"
+
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "com.android.support:appcompat-v7:$supportVer.androidSupport"
+    implementation "com.android.support:cardview-v7:$supportVer.androidSupport"
+    implementation "com.android.support:recyclerview-v7:$supportVer.androidSupport"
+    implementation "com.android.support:design:$supportVer.androidSupport"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$supportVer.kotlin"
+    implementation "io.reactivex.rxjava2:rxjava:$supportVer.rxjava2"
+    implementation "io.reactivex.rxjava2:rxandroid:$supportVer.rxandroid"
+    implementation "com.squareup.retrofit2:retrofit:$supportVer.retrofit"
+    implementation "com.squareup.retrofit2:converter-gson:$supportVer.retrofit"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$supportVer.retrofit"
     implementation 'com.amap.api:location:3.8.0'
     implementation 'de.psdev.licensesdialog:licensesdialog:1.8.0'
     implementation 'com.miguelcatalan:materialsearchview:1.4.0'
     implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar'
-    //    implementation "org.jetbrains.anko:anko:$anko_ver"
+    //    implementation "org.jetbrains.anko:anko:$supportVer.anko"
 }
