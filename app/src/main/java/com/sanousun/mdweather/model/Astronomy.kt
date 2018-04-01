@@ -58,9 +58,9 @@ data class Astronomy(
 
     fun isDay(): Boolean {
         val sdf = SimpleDateFormat("HH:mm", Locale.CHINA)
-        val riseTime = sdf.parse(mr).time
-        val setTime = sdf.parse(ms).time
-        val nowTime = Date().time
+        val riseTime = sdf.parse(sr).time
+        val setTime = sdf.parse(ss).time
+        val nowTime = sdf.parse(sdf.format(Date())).time
         return nowTime in (riseTime + 1)..(setTime - 1)
     }
 }

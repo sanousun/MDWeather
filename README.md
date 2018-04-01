@@ -2,6 +2,10 @@ MDWeather
 ========
 # 注意
 需要将 gradle.properties 中加上自己申请的高德地图的key和和风天气的key
+## UI方面
+前段时间找到了一个非常棒的开源天气app
+[几何天气](https://github.com/WangDaYeeeeee/GeometricWeather)
+所以UI方面打算用他的方案了，类似于一加天气，我把他的view实现放在单独的module-weather_bg里，再看情况实现以下自己的动画效果
 
 ## 前言
 最初的灵感来源于 materialup 上的一些天气应用设计，刚好那时候想着试试 retrofit + rxjava 的组合，于是这个应用的开发
@@ -18,6 +22,3 @@ MDWeather
 
 ## 数据来源
 和风天气
-
-## 这是我的邮箱，欢迎联系交流
-sanousun@163.com

@@ -11,6 +11,7 @@
         android:id="@+id/tv_brf"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="?attr/mainTextColor"
         android:textSize="16sp"
         tools:text="穿衣指数：较舒适"/>
 
@@ -19,6 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:textColor="?attr/mainTextSecondColor"
         android:textSize="12sp"
         tools:text="建议着薄外套、开衫牛仔衫裤等服装。年老体弱者应适当添加衣物，宜着夹克衫、薄毛衣等。"/>
 

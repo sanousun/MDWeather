@@ -4,11 +4,7 @@
         <attr name="asv_clock_radio" format="dimension"/>
         <attr name="asv_icon_radio" format="dimension"/>
     </declare-styleable>
-    <declare-styleable name="SunView">
-        <attr name="sv_color" format="color"/>
-    </declare-styleable>
-    <declare-styleable name="CloudView">
-        <attr name="cv_color" format="color"/>
-        <attr name="cv_path" format="string"/>
-    </declare-styleable>
+
+    <attr name="mainTextColor" format="color"/>
+    <attr name="mainTextSecondColor" format="color"/>
 </resources>

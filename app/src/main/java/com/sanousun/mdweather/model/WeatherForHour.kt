@@ -6,7 +6,6 @@ package com.sanousun.mdweather.model
  */
 
 data class WeatherForHour(
-        val astro: Astronomy,
         /**
          * 天气状况
          */

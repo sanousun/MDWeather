@@ -16,12 +16,14 @@ import com.sanousun.mdweather.R
 import com.sanousun.mdweather.adapter.DailyAdapter
 import com.sanousun.mdweather.adapter.HourlyAdapter
 import com.sanousun.mdweather.adapter.SuggestionAdapter
+import com.sanousun.mdweather.bg.WeatherView
 import com.sanousun.mdweather.model.response.WeatherResponse
 import com.sanousun.mdweather.network.WeatherApiService
 import com.sanousun.mdweather.rxmethod.ErrorReturn
 import com.sanousun.mdweather.rxmethod.RxTransferHelper
 import com.sanousun.mdweather.support.util.LogUtil
 import com.sanousun.mdweather.widget.SimpleDividerDecoration
+import com.sanousun.mdweather.widget.weather.convertToKindRule
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -33,7 +35,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : BaseActivity() {
 
     companion object {
-        val EXTRA_CITY = "extra_city"
+        const val EXTRA_CITY = "extra_city"
         fun createIntent(context: Context, city: String): Intent {
             val intent = Intent(context, MainActivity::class.java)
             intent.putExtra(EXTRA_CITY, city)
@@ -52,6 +54,26 @@ class MainActivity : BaseActivity() {
 
     override fun setLayoutId(): Int {
         return R.layout.activity_main
+    }
+
+    override fun initView() {
+        setSupportActionBar(toolbar)
+        //初始化每日天气预报
+        rv_daily_forecast.layoutManager =
+                GridLayoutManager(this, 3, LinearLayoutManager.VERTICAL, false)
+        rv_daily_forecast.adapter = dailyAdapter
+        //初始化小时天气预报
+        rv_hourly_forecast.layoutManager =
+                LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        rv_hourly_forecast.adapter = hourlyAdapter
+        //初始化天气指数
+        rv_suggest_forecast.layoutManager =
+                LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        rv_suggest_forecast.adapter = suggestAdapter
+        rv_suggest_forecast.addItemDecoration(SimpleDividerDecoration(this))
+
+        rf_layout.setOnRefreshListener { loadData() }
+        weather_bg.setOpenGravitySensor(true)
     }
 
     override fun initData(savedInstanceState: Bundle?) {
@@ -104,52 +126,29 @@ class MainActivity : BaseActivity() {
         outState?.putString(EXTRA_CITY, city)
     }
 
-    override fun initView() {
-        setSupportActionBar(toolbar)
-        rf_layout.setProgressViewOffset(false, 0, 100)
-        //初始化每日天气预报
-        rv_daily_forecast.layoutManager =
-                GridLayoutManager(this, 3, LinearLayoutManager.VERTICAL, false)
-        rv_daily_forecast.adapter = dailyAdapter
-        //初始化小时天气预报
-        rv_hourly_forecast.layoutManager =
-                LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        rv_hourly_forecast.adapter = hourlyAdapter
-        //初始化天气指数
-        rv_suggest_forecast.layoutManager =
-                LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        rv_suggest_forecast.adapter = suggestAdapter
-        rv_suggest_forecast.addItemDecoration(SimpleDividerDecoration(this))
-
-        rf_layout.setOnRefreshListener { loadData() }
-        ab_layout.addOnOffsetChangedListener { _, verticalOffset ->
-            rf_layout.isEnabled = verticalOffset == 0
-        }
-    }
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
+        return when (item?.itemId) {
             R.id.action_city_list -> {
                 val intent = Intent(this, CityListActivity::class.java)
                 startActivity(intent)
-                return true
+                true
             }
             R.id.action_main_about -> {
                 val intent = Intent(this, AboutActivity::class.java)
                 startActivity(intent)
-                return true
+                true
             }
             else ->
-                return super.onOptionsItemSelected(item)
+                super.onOptionsItemSelected(item)
         }
     }
 
-    fun loadData() {
+    private fun loadData() {
         rf_layout.isRefreshing = true
         val disposable = WeatherApiService.create()
                 .getWeatherByCity(city)
@@ -171,12 +170,14 @@ class MainActivity : BaseActivity() {
         disposables.add(disposable)
     }
 
-    fun fillContent(weather: WeatherResponse) {
+    private fun fillContent(weather: WeatherResponse) {
         toolbar.title = weather.basic?.city
         tv_temp.text = String.format("%d°", weather.now?.tmp)
         tv_weather.text = weather.now?.cond?.txt
         tv_wind.text = String.format("%s %s", weather.now?.wind?.dir, weather.now?.wind?.sc)
-
+        weather_bg.setWeather(
+                weather.daily_forecast?.get(0)?.convertToKindRule()
+                        ?: WeatherView.WEATHER_KIND_CLEAR_DAY)
         dailyAdapter.clear()
         weather.daily_forecast?.let {
             dailyAdapter.addAll(it)
